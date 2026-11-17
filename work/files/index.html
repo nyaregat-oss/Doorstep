@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Doorstep – Find the right professional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#F6F7F9;--surface:#fff;--ink:#10202F;--muted:#566679;--brand:#0F4C81;--on-brand:#fff;--accent:#FFC845;--on-accent:#10202F;--line:#DCE2E9;--panel:#0F4C81;--on-panel:#fff;--shadow:0 1px 2px rgba(16,32,47,.06),0 10px 28px rgba(16,32,47,.07);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#000;--surface:#0C0F13;--ink:#EEF2F6;--muted:#9AA9B9;--brand:#6FB1F0;--on-brand:#000;--line:#1E2630;--panel:#0C0F13;--on-panel:#EEF2F6;--shadow:0 0 0 1px #1E2630}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#000;--surface:#0C0F13;--ink:#EEF2F6;--muted:#9AA9B9;--brand:#6FB1F0;--on-brand:#000;--line:#1E2630;--panel:#0C0F13;--on-panel:#EEF2F6;--shadow:0 0 0 1px #1E2630}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 Figtree,system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;line-height:1.1;margin:0;letter-spacing:-.02em}
+h1{font-weight:800;font-size:clamp(2.4rem,5.6vw,4.2rem)}
+h2{font-weight:800;font-size:clamp(1.8rem,4vw,2.6rem)}
+h3{font-weight:600;font-size:1.2rem;letter-spacing:-.01em}
+p{margin:0}a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+.muted{color:var(--muted)}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 0;gap:16px}
+.logo{font:800 1.4rem "Bricolage Grotesque",sans-serif;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo i{width:22px;height:22px;border-radius:7px 7px 7px 0;background:var(--accent);display:inline-block}
+nav{display:flex;gap:20px;align-items:center;font-weight:500;font-size:.95rem}
+nav a{text-decoration:none;color:var(--muted)}nav a:hover{color:var(--ink)}
+.btn{display:inline-block;border:0;cursor:pointer;font:600 1rem Figtree,sans-serif;padding:13px 22px;border-radius:10px;background:var(--brand);color:var(--on-brand);text-decoration:none;transition:filter .15s}
+.btn:hover{filter:brightness(1.1)}
+.btn.alt{background:var(--accent);color:var(--on-accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:8px 14px;font-size:.9rem}
+.btn[disabled]{opacity:.7;cursor:default}
+.icon-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:1.1rem}
+.hero{display:grid;grid-template-columns:1fr 1.05fr;gap:52px;align-items:start;padding:48px 0 80px}
+.hero .lead{font-size:1.18rem;color:var(--muted);max-width:30em;margin:20px 0 26px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.match{padding:22px}
+.fields{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin:14px 0 10px}
+.fields .full{grid-column:1/-1}
+label{display:grid;gap:5px;font-weight:600;font-size:.88rem}
+input,select{font:400 1rem Figtree,sans-serif;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;align-items:center;font-size:.9rem;color:var(--muted)}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);font:500 .9rem Figtree,sans-serif;padding:6px 12px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--brand)}
+.res-head{font-weight:600;margin:6px 0 2px}
+.pro{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--line)}
+.av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 1rem "Bricolage Grotesque",sans-serif}
+.pro .info{flex:1;min-width:0}.pro strong{display:block;font-weight:600}
+.pro span,.note{font-size:.86rem;color:var(--muted)}
+.tag{display:inline-block;font-size:.72rem;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--brand);color:var(--on-brand);margin-left:6px;vertical-align:middle}
+.empty{padding:18px 0 6px;color:var(--muted)}
+.note{margin-top:8px}
+section{padding:68px 0}
+.sub{max-width:34em;margin-top:12px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin:36px 0 0;padding:0;counter-reset:s}
+.steps li{list-style:none;counter-increment:s;border-top:3px solid var(--accent);padding-top:16px}
+.steps li::before{content:counter(s);font:800 2rem "Bricolage Grotesque",sans-serif;display:block}
+.steps p{color:var(--muted);margin-top:6px}
+.split{display:grid;grid-template-columns:1fr 1fr;box-shadow:var(--shadow);border-radius:20px}
+.side{padding:48px 44px}
+.side.cust{background:var(--surface);border:1px solid var(--line);border-right:0;border-radius:20px 0 0 20px}
+.side.prov{background:var(--panel);color:var(--on-panel);border:1px solid var(--line);border-left:0;border-radius:0 20px 20px 0}
+.side ul{margin:20px 0 26px;padding:0;list-style:none;display:grid;gap:10px}
+.side li{padding-left:26px;position:relative}
+.side li::before{content:"";position:absolute;left:0;top:.5em;width:12px;height:6px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg)}
+.side.prov .btn{background:var(--accent);color:var(--on-accent)}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px}
+.cat{text-align:left;padding:16px;cursor:pointer;font:inherit;color:inherit;display:grid;gap:4px;transition:border-color .15s,transform .15s}
+.cat:hover{border-color:var(--brand);transform:translateY(-2px)}
+.cat .m{width:34px;height:34px;border-radius:9px;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;font:800 1rem "Bricolage Grotesque",sans-serif;margin-bottom:6px}
+.cat strong{font-weight:600}.cat span{font-size:.85rem;color:var(--muted);line-height:1.4}
+.feat{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px}
+.feat .card{padding:18px}.feat .av{width:52px;height:52px;margin-bottom:12px}
+.feat p{font-size:.88rem;color:var(--muted)}
+.trust{display:grid;grid-template-columns:repeat(2,1fr);gap:28px 44px;margin-top:32px}
+.trust h3{margin-bottom:4px}.trust p{color:var(--muted)}
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}
+.quotes .card{padding:22px}.quotes p{margin-bottom:12px}
+details{border-top:1px solid var(--line);padding:16px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::after{content:"+";font-size:1.3rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin-top:10px;color:var(--muted);max-width:44em}
+.faq{max-width:760px;margin-top:28px}
+.final{background:var(--panel);color:var(--on-panel);border-radius:24px;padding:56px 48px;display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start;border:1px solid var(--line)}
+.final .sub{color:inherit;opacity:.85}
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:12px;padding:4px;background:var(--surface);margin-bottom:16px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:600 .92rem Figtree,sans-serif;padding:9px 14px;border-radius:9px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--brand);color:var(--on-brand)}
+.formcard{padding:22px;color:var(--ink)}
+form{display:grid;gap:12px}
+.ok{padding:6px 0}
+footer{border-top:1px solid var(--line);padding:44px 0 36px;margin-top:40px;color:var(--muted);font-size:.93rem}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px}
+footer h4{margin:0 0 10px;color:var(--ink);font-size:.95rem}
+footer a{display:block;text-decoration:none;padding:3px 0}footer a:hover{color:var(--ink)}
+.legal{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+textarea{font:400 1rem Figtree,sans-serif;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-height:84px;resize:vertical}
+.bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px;margin:22px 0 14px;align-items:end}
+.chk{display:flex!important;align-items:center;gap:8px;font-weight:500;padding-bottom:12px}.chk input{width:auto}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.bcard{padding:18px;text-decoration:none;display:grid;gap:12px;transition:border-color .15s}.bcard:hover{border-color:var(--brand)}
+.bcard .top{display:flex;gap:12px;align-items:center}.bcard .top div{min-width:0}
+.back{display:inline-block;margin:26px 0 14px;text-decoration:none;color:var(--muted);font-weight:500}
+.phead{display:flex;gap:18px;align-items:center;padding:24px;margin-bottom:16px}.phead .av{width:72px;height:72px;font-size:1.4rem}
+.pgrid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+.pblock{padding:24px;margin-bottom:16px}.pblock h3{margin-bottom:10px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tiles div{aspect-ratio:4/3;background:var(--bg);border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;font-size:.78rem;color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:6px}
+.days div{text-align:center;border-radius:8px;padding:6px 0;font-size:.76rem;border:1px solid var(--line);color:var(--muted)}
+.days .on{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.sticky{position:sticky;top:16px}
+@media (max-width:900px){.bar,.bgrid{grid-template-columns:1fr 1fr}.pgrid{grid-template-columns:1fr}.sticky{position:static}.phead{flex-wrap:wrap}}
+.pro span.tag{color:var(--on-brand)}
+.banner{padding:12px 16px;border-radius:12px;background:var(--surface);border:1px dashed var(--brand);margin:8px 0 20px;font-size:.92rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:18px 0}
+.stats .card{padding:14px}.stats b{font:800 1.8rem "Bricolage Grotesque",sans-serif;display:block;line-height:1.2}
+.prog{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 10px}.prog i{display:block;height:100%;background:var(--brand)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.acts input{width:auto}
+.chk2{display:flex;gap:8px;align-items:center;font-weight:400;padding:4px 0}.chk2 input{width:auto}
+.fgrid>div{min-width:0;overflow-wrap:anywhere}
+@media (max-width:480px){.fgrid{grid-template-columns:1fr}.bar,.bgrid{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){
+.hero,.final{grid-template-columns:1fr;gap:32px}.final{padding:36px 24px}
+.steps,.quotes,.trust{grid-template-columns:1fr}
+.split{grid-template-columns:1fr}.side{padding:34px 24px}
+.side.cust{border-right:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0}
+.side.prov{border-left:1px solid var(--line);border-radius:0 0 20px 20px}
+.cats,.feat{grid-template-columns:repeat(2,1fr)}.fgrid{grid-template-columns:1fr 1fr}
+header{flex-wrap:wrap}nav{width:100%;flex-wrap:wrap;gap:8px 18px}nav a[href="#top"]{display:none}
+}
+@media (max-width:480px){.fields{grid-template-columns:1fr}.cats,.feat{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cat{transition:none}.cat:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="#top"><i></i>Doorstep</a>
+  <nav aria-label="Main">
+    <a class="hide" href="#top">Home</a>
+    <a class="hide" href="#browse">Explore Services</a>
+    <a class="hide" href="#how">How It Works</a>
+    <a class="hide" href="#providers" data-role="provider">Become a Provider</a>
+    <a class="hide" href="#about">About</a>
+    <a class="hide" href="#join">Login</a>
+    <a class="btn small" href="#join">Get Started</a>
+    <button class="icon-btn" id="theme" type="button" aria-label="Switch between light and dark mode"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+  </nav>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div>
+      <h1>Find the Right Professional. Get Things Done.</h1>
+      <p class="lead">Discover trusted professionals, compare services, and connect with the right people to get your work done.</p>
+      <div class="cta">
+        <a class="btn" href="#browse">Find a professional</a>
+        <a class="btn alt" href="#join" data-role="provider">Offer your services</a>
+      </div>
+    </div>
+    <div class="card match" id="match">
+      <h3>Search professionals</h3>
+      <form id="search" class="fields" autocomplete="off">
+        <label class="full">What do you need?<input id="q" list="svc" placeholder="Plumbing, cleaning, photography…"></label>
+        <label>Location<input id="loc" placeholder="City or ZIP"></label>
+        <label>Budget (optional)<select id="bud"><option value="0">Any budget</option><option value="50">Starts at up to $50</option><option value="100">Starts at up to $100</option><option value="250">Starts at up to $250</option><option value="500">Starts at up to $500</option></select></label>
+        <button class="btn full" type="submit">Search</button>
+      </form>
+      <datalist id="svc"></datalist>
+      <div class="chips" id="pop"><span>Popular:</span></div>
+      <div id="out" aria-live="polite"></div>
+      <a class="btn ghost small" href="#browse" id="seeAll" style="margin-top:12px">Browse all providers</a>
+    </div>
+  </div>
+
+  <section id="how">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><h3>Discover</h3><p>Find the service you need and see who offers it nearby.</p></li>
+      <li><h3>Connect</h3><p>Compare prices, ratings, and portfolios, then contact the professionals you like.</p></li>
+      <li><h3>Get it done</h3><p>Agree on the details, complete the job, and leave a review.</p></li>
+    </ol>
+  </section>
+
+  <section id="providers">
+    <div class="split">
+      <div class="side cust">
+        <h2>For customers</h2>
+        <ul><li>Find professionals easily</li><li>Compare prices side by side</li><li>Read reviews from past customers</li><li>Request quotations in minutes</li><li>Book at a time that suits you</li></ul>
+        <a class="btn" href="#browse">Browse providers</a>
+      </div>
+      <div class="side prov">
+        <h2>For providers</h2>
+        <ul><li>Reach more customers in your area</li><li>Showcase your work and expertise</li><li>Receive service requests directly</li><li>Build your reputation with reviews</li><li>Grow your business</li></ul>
+        <a class="btn" href="#join" data-role="provider">Create your profile</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="explore">
+    <h2>Popular service categories</h2>
+    <p class="sub">Choose a category to see sample professionals in the search above.</p>
+    <div class="cats" id="cats"></div>
+  </section>
+
+  <section id="featured">
+    <h2>Featured professionals</h2>
+    <p class="sub">Sample profiles for illustration. Real professionals will appear here once they join.</p>
+    <div class="feat" id="feat"></div>
+  </section>
+
+  <section id="trust">
+    <h2>Built for trust and safety</h2>
+    <div class="trust">
+      <div><h3>Identity verification</h3><p>Providers verify who they are before earning a verified badge.</p></div>
+      <div><h3>Honest reviews</h3><p>Only customers who completed a booking can review a provider.</p></div>
+      <div><h3>Clear pricing</h3><p>See starting prices and request a written quote before you commit.</p></div>
+      <div><h3>Protected conversations</h3><p>Message inside Doorstep so your phone number and email stay private until you choose to share them.</p></div>
+    </div>
+    <p class="note">These are the standards Doorstep is being designed around. They go live with the platform.</p>
+  </section>
+
+  <section id="about">
+    <h2>What people will say</h2>
+    <p class="sub">Sample testimonials. We’ll replace these with real ones after launch.</p>
+    <div class="quotes">
+      <div class="card"><p>“I posted a leak at 8am and had three quotes before lunch.”</p><span class="note">Sample customer</span></div>
+      <div class="card"><p>“My calendar is full of local jobs and I didn’t spend a cent on ads.”</p><span class="note">Sample provider</span></div>
+      <div class="card"><p>“Seeing prices and reviews together made choosing a photographer easy.”</p><span class="note">Sample customer</span></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details><summary>Is Doorstep live yet?</summary><p>Not yet. This page is a preview. Search results are samples, and sign-ups aren’t saved.</p></details>
+      <details><summary>What does it cost customers?</summary><p>The plan is for searching, comparing, and requesting quotes to be free. Pricing details will be shared before launch.</p></details>
+      <details><summary>How do providers get verified?</summary><p>Providers will confirm their identity and business details. Verified providers get a badge on their profile.</p></details>
+      <details><summary>Can I add a service that isn’t listed?</summary><p>Yes. Categories are configurable, so new ones can be added as providers ask for them.</p></details>
+      <details><summary>How do bookings work?</summary><p>You describe the job and pick a date. The provider accepts, declines, or suggests another time.</p></details>
+    </div>
+  </section>
+
+  <section id="join">
+    <div class="final">
+      <div>
+        <h2>Ready to get started?</h2>
+        <p class="sub">Tell us who you are and what you do or need. We’ll be in touch when Doorstep opens in your area.</p>
+      </div>
+      <div class="card formcard">
+        <div class="tabs" role="tablist" aria-label="I am a">
+          <button role="tab" id="t-customer" aria-selected="true" data-role="customer">I need a service</button>
+          <button role="tab" id="t-provider" aria-selected="false" data-role="provider">I offer a service</button>
+        </div>
+        <form id="form">
+          <label>Full name<input name="name" required autocomplete="name"></label>
+          <label>Email<input name="email" type="email" required autocomplete="email"></label>
+          <label id="bizWrap" hidden>Business name<input name="biz" autocomplete="organization"></label>
+          <label><span id="svcLabel">Service you need</span><select name="service" id="svcSel"></select></label>
+          <button class="btn" type="submit" id="submit">Notify me</button>
+          <p class="note">Preview only: nothing you enter here is saved or sent yet.</p>
+        </form>
+        <div class="ok" id="ok" hidden role="status"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<main id="viewBrowse" hidden>
+  <a class="back" href="#top">← Back to home</a>
+  <h1 style="font-size:clamp(2rem,4.5vw,3rem)">Explore professionals</h1>
+  <p class="sub">All profiles here are samples for demonstration.</p>
+  <div class="card bar">
+    <label>Category<select id="bCat"></select></label>
+    <label>Area<select id="bArea"></select></label>
+    <label>Starting price<select id="bPrice"><option value="0">Any price</option><option value="50">Up to $50</option><option value="100">Up to $100</option><option value="250">Up to $250</option><option value="500">Up to $500</option></select></label>
+    <label>Rating<select id="bRate"><option value="0">Any rating</option><option value="4.6">4.6 and up</option><option value="4.8">4.8 and up</option></select></label>
+    <label>Availability<select id="bAvail"></select></label>
+    <label>Sort by<select id="bSort"><option value="rating">Top rated</option><option value="price">Lowest price</option><option value="jobs">Most jobs</option></select></label>
+    <label class="chk"><input type="checkbox" id="bVer">Verified only</label>
+    <button class="btn ghost" type="button" id="bClear" style="margin-bottom:0">Clear filters</button>
+  </div>
+  <p class="muted" id="bCount" aria-live="polite"></p>
+  <div class="bgrid" id="bOut"></div>
+</main>
+<main id="viewPro" hidden></main>
+<main id="viewDash" hidden></main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div><a class="logo" href="#top" style="padding:0 0 8px"><i></i>Doorstep</a><p>Connecting people with the professionals who get things done.</p></div>
+      <div><h4>Explore</h4><a href="#explore">Services</a><a href="#featured">Professionals</a><a href="#how">How it works</a></div>
+      <div><h4>Company</h4><a href="#about">About</a><a href="#trust">Trust and safety</a><a href="#providers">Become a provider</a><a href="#customer-demo">Customer dashboard (demo)</a><a href="#provider-demo">Provider dashboard (demo)</a></div>
+      <div><h4>Support</h4><a href="#faq">FAQ</a><a href="#join">Contact</a><span>hello@doorstep.example</span></div>
+    </div>
+    <div class="legal"><span>© 2026 Doorstep</span><span>Sample content shown for demonstration.</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+var root=document.documentElement;
+try{var t=localStorage.getItem("theme");if(t)root.setAttribute("data-theme",t)}catch(e){}
+document.getElementById("theme").onclick=function(){
+  var dark=root.getAttribute("data-theme")==="dark"||(!root.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);
+  var n=dark?"light":"dark";root.setAttribute("data-theme",n);
+  try{localStorage.setItem("theme",n)}catch(e){}
+};
+var C=[["Plumbing","Leaks, drains, and installs",35,"plumber pipes leak drain"],["Electrical","Wiring, lighting, and repairs",45,"electrician wiring lights"],["Cleaning","Homes, offices, and deep cleans",30,"cleaner maid"],["Home repairs","Fixes and maintenance",40,"handyman maintenance"],["Painting","Interior and exterior",60,"painter paint"],["Carpentry","Furniture and fittings",50,"carpenter wood"],["Beauty","Hair, makeup, and grooming",25,"salon hair makeup barber"],["Photography","Portraits, events, and products",120,"photographer photos"],["Event planning","Parties to weddings",150,"events wedding party"],["Moving","Moving and delivery",80,"movers delivery"],["Gardening","Lawns and landscaping",35,"landscaping lawn garden"],["Catering","Food for any occasion",90,"caterer food"],["IT support","Computer and network help",40,"computer tech laptop"],["Web and design","Websites and graphics",150,"website developer graphic designer"],["Tutoring","Lessons for all ages",25,"tutor teacher lessons"],["Automotive","Repairs and detailing",45,"car mechanic auto"]];
+var N=["Marco Reyes","Lena Okafor","Priya Nair","Sam Whitfield","Ana Torres","Kenji Mori","Rosa Delgado","Daniel Cho","Amara Obi","Tomas Novak","Grace Liu","Ibrahim Yusuf"];
+var B=["Pro","& Co.","Works","Studio"],A=["Available today","Tomorrow","This week","Weekends"],AR=["Riverside","Midtown","Hillcrest","Harbor"];
+function pros(i){return[0,1,2].map(function(j){var n=N[(i*3+j)%N.length];
+ return{n:n,b:n.split(" ")[0]+"’s "+C[i][0]+" "+B[(i+j)%4],c:C[i][0],r:(4.5+((i+j*3)%5)/10).toFixed(1),jobs:40+((i*37+j*53)%260),p:Math.round(C[i][2]*(.8+j*.2)),a:A[(i+j)%4],v:j!==2,i:i,j:j,area:AR[(i*2+j)%4],id:"pro-"+i+"-"+j}})}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function ini(n){return n.split(" ").map(function(w){return w[0]}).slice(0,2).join("")}
+var q=document.getElementById("q"),loc=document.getElementById("loc"),bud=document.getElementById("bud"),out=document.getElementById("out");
+function run(){
+  var v=q.value.trim().toLowerCase(),b=+bud.value,l=loc.value.trim();
+  if(!v){out.innerHTML='<p class="empty">Enter a service to see sample matches.</p>';return}
+  var idx=[];C.forEach(function(c,i){if((c[0]+" "+c[3]).toLowerCase().indexOf(v)>-1)idx.push(i)});
+  if(!idx.length){out.innerHTML='<p class="empty">No sample category matches “'+esc(q.value.trim())+'”. Try one of the popular services above.</p>';return}
+  var list=[];idx.slice(0,2).forEach(function(i){list=list.concat(pros(i))});
+  var all=list.length;
+  if(b)list=list.filter(function(p){return p.p<=b});
+  list.sort(function(x,y){return y.r-x.r});
+  var head=list.length+" sample match"+(list.length===1?"":"es")+(l?" for "+esc(l):"");
+  if(!list.length){out.innerHTML='<p class="empty">None of the '+all+' sample providers start at $'+b+' or less. Try a higher budget.</p>';return}
+  out.innerHTML='<p class="res-head">'+head+'<span class="tag">Sample</span></p>'+list.map(function(p){
+    return '<div class="pro"><div class="av" aria-hidden="true">'+esc(ini(p.n))+'</div><div class="info"><strong>'+esc(p.b)+(p.v?'<span class="tag">Verified</span>':'')+'</strong><span>★ '+p.r+' · '+p.jobs+' jobs · From $'+p.p+' · '+p.a+'</span></div><button class="btn small" type="button">Request quote</button></div>'}).join("")+'<p class="note">Sample results for demonstration. Location isn’t used for ranking yet.</p>';
+}
+function pick(name){q.value=name;run();rs(name);document.getElementById("match").scrollIntoView({behavior:"smooth",block:"center"})}
+document.getElementById("search").onsubmit=function(e){e.preventDefault();run();rs(q.value)};
+out.addEventListener("click",function(e){var b=e.target.closest("button");if(b){b.textContent="Requested (demo)";b.disabled=true}});
+var dl=document.getElementById("svc"),sel=document.getElementById("svcSel"),pop=document.getElementById("pop"),cats=document.getElementById("cats");
+C.forEach(function(c){
+  dl.insertAdjacentHTML("beforeend",'<option value="'+esc(c[0])+'">');
+  sel.insertAdjacentHTML("beforeend","<option>"+esc(c[0])+"</option>");
+  cats.insertAdjacentHTML("beforeend",'<button class="card cat" type="button" data-n="'+esc(c[0])+'"><div class="m" aria-hidden="true">'+esc(c[0][0])+'</div><strong>'+esc(c[0])+'</strong><span>'+esc(c[1])+'</span></button>');
+});
+["Plumbing","Cleaning","Photography","IT support"].forEach(function(n){
+  var b=document.createElement("button");b.className="chip";b.type="button";b.textContent=n;b.onclick=function(){q.value=n;run();rs(n)};pop.appendChild(b)});
+cats.addEventListener("click",function(e){var b=e.target.closest(".cat");if(b)pick(b.getAttribute("data-n"))});
+document.getElementById("feat").innerHTML=[0,2,7,12].map(function(i){var p=pros(i)[0];
+  return '<div class="card"><div class="av" aria-hidden="true">'+esc(ini(p.n))+'</div><h3>'+esc(p.n)+'</h3><p>'+esc(p.c)+' · ★ '+p.r+'</p><p>From $'+p.p+' · '+p.a+'</p><span class="tag" style="margin:8px 0 0">Sample</span></div>'}).join("");
+var ALL=[];C.forEach(function(c,i){ALL=ALL.concat(pros(i))});
+var F={cat:"",area:"",price:0,rate:0,avail:"",ver:false,sort:"rating"};
+var $=function(i){return document.getElementById(i)};
+function opts(el,arr){el.innerHTML=arr.map(function(o){return'<option value="'+esc(o[0])+'">'+esc(o[1])+'</option>'}).join("")}
+opts($("bCat"),[["","All categories"]].concat(C.map(function(c,i){return[String(i),c[0]]})));
+opts($("bArea"),[["","Any area"]].concat(AR.map(function(a){return[a,a]})));
+opts($("bAvail"),[["","Any time"]].concat(A.map(function(a){return[a,a]})));
+var ctl={bCat:"cat",bArea:"area",bPrice:"price",bRate:"rate",bAvail:"avail",bSort:"sort"};
+Object.keys(ctl).forEach(function(id){$(id).onchange=function(){F[ctl[id]]=this.value;renderBrowse()}});
+$("bVer").onchange=function(){F.ver=this.checked;renderBrowse()};
+$("bClear").onclick=function(){F={cat:"",area:"",price:0,rate:0,avail:"",ver:false,sort:"rating"};renderBrowse()};
+$("seeAll").onclick=function(){var v=q.value.trim().toLowerCase();F.cat="";C.forEach(function(c,i){if(!F.cat&&v&&(c[0]+" "+c[3]).toLowerCase().indexOf(v)>-1)F.cat=String(i)})};
+function renderBrowse(){
+  Object.keys(ctl).forEach(function(id){$(id).value=F[ctl[id]]});$("bVer").checked=F.ver;
+  var l=ALL.filter(function(p){return(F.cat===""||p.i==F.cat)&&(!F.area||p.area===F.area)&&(!+F.price||p.p<=+F.price)&&p.r>=+F.rate&&(!F.avail||p.a===F.avail)&&(!F.ver||p.v)});
+  l.sort(function(x,y){return F.sort==="price"?x.p-y.p:F.sort==="jobs"?y.jobs-x.jobs:y.r-x.r});
+  $("bCount").textContent=l.length+" of "+ALL.length+" sample professionals";
+  $("bOut").innerHTML=l.length?l.map(function(p){return'<a class="card bcard" href="#'+p.id+'"><div class="top"><div class="av" aria-hidden="true">'+esc(ini(p.n))+'</div><div><strong>'+esc(p.b)+'</strong><br><span class="note">'+esc(p.c)+' · '+esc(p.area)+'</span></div></div><span class="note" style="margin:0">★ '+p.r+' · '+p.jobs+' jobs · From $'+p.p+' · '+p.a+(p.v?' · <b>Verified</b>':'')+'</span></a>'}).join(""):'<p class="empty">No sample professionals match these filters. Try clearing some.</p>';
+}
+var VB=$("viewBrowse"),VP=$("viewPro"),HM=$("top");
+function renderPro(p){
+  var c=C[p.i],yrs=3+((p.i+p.j*2)%9),d=new Date(),days="",iso=new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+  for(var k=0;k<7;k++){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()+k);days+='<div class="'+((p.i+p.j+k)%3?'on':'')+'">'+x.toLocaleDateString("en-US",{weekday:"short"})+'<br>'+x.getDate()+'</div>'}
+  var svc=[["Quick visit",p.p],["Standard job",p.p*2],["Full project",p.p*5]];
+  var rv=[["Jordan P.","★★★★★","Showed up on time and did exactly what was quoted."],["Maya S.","★★★★★","Clear communication and tidy work. Would hire again."],["Chris L.","★★★★☆","Fair price and a quick turnaround."]];
+  VP.innerHTML='<a class="back" href="#browse">← Back to results</a>'+
+  '<div class="card phead"><div class="av" aria-hidden="true">'+esc(ini(p.n))+'</div><div><h1 style="font-size:clamp(1.7rem,4vw,2.4rem)">'+esc(p.b)+'</h1><p class="muted">'+esc(c[0])+' · '+esc(p.area)+' · ★ '+p.r+' · '+p.jobs+' jobs'+(p.v?'<span class="tag">Verified</span>':'')+'<span class="tag">Sample</span></p></div></div>'+
+  '<div class="pgrid"><div>'+
+  '<div class="card pblock"><h3>About</h3><p class="muted">'+esc(p.n)+' has offered '+esc(c[0].toLowerCase())+' services for '+yrs+' years and covers '+esc(p.area)+' and nearby areas. This is sample text; real providers write their own.</p></div>'+
+  '<div class="card pblock"><h3>Services and prices</h3>'+svc.map(function(s){return'<div class="row"><span>'+s[0]+'</span><strong>From $'+s[1]+'</strong></div>'}).join("")+'</div>'+
+  '<div class="card pblock"><h3>Portfolio</h3><div class="tiles"><div>Sample work</div><div>Sample work</div><div>Sample work</div><div>Sample work</div></div></div>'+
+  '<div class="card pblock"><h3>Reviews</h3>'+S.rvs.filter(function(x){return x.pid===p.id}).map(function(x){return'<div class="row" style="display:block"><strong>You</strong> <span class="muted">'+x.r+' \u2605</span> <span class="tag">Your review (demo)</span><p class="muted">'+esc(x.t)+'</p></div>'}).join("")+rv.map(function(r){return'<div class="row" style="display:block"><strong>'+r[0]+'</strong> <span class="muted">'+r[1]+'</span><p class="muted">'+r[2]+'</p></div>'}).join("")+'<p class="note">Sample reviews.</p></div>'+
+  '</div><div class="sticky"><div class="card pblock"><h3>Availability</h3><div class="days">'+days+'</div><p class="note">Highlighted days are open (sample).</p></div>'+
+  '<div class="card pblock"><h3>Request a booking</h3><form id="bk"><label>Service<select>'+svc.map(function(s){return'<option>'+s[0]+'</option>'}).join("")+'</select></label><label>Preferred date<input type="date" min="'+iso+'" required></label><label>What do you need?<textarea required></textarea></label><button class="btn" type="submit">Send request</button><p class="note">Preview only: requests aren’t sent or saved yet.</p></form><div id="bkOk" hidden role="status"></div></div></div></div>';
+  VP.querySelector("#bk").onsubmit=function(e){e.preventDefault();var f=this,dt=f.querySelector("input").value;S.bk.unshift({id:S.n++,pid:p.id,svc:f.querySelector("select").value,date:dt,note:f.querySelector("textarea").value.trim(),st:"pending",who:"You"});S.cur=p.id;note("You requested "+p.b+" for "+dt+".");f.hidden=true;var o=VP.querySelector("#bkOk");o.innerHTML="Request sent to "+esc(p.b)+" (demo, nothing is saved). Track it in the <a href=\"#customer-demo\">customer dashboard</a>, or respond to it as the provider in the <a href=\"#provider-demo\">provider dashboard</a>.";o.hidden=false};
+}
+var VD=$("viewDash"),ST={pending:"Pending",accepted:"Accepted",declined:"Declined",proposed:"New date proposed",completed:"Completed"},TD=new Date().toISOString().slice(0,10);
+var S={n:5,cur:"pro-0-0",saved:{"pro-3-0":1,"pro-7-1":1},sv:{},pf:{photo:1,bio:1,services:0,portfolio:0,coverage:0},rs:[],rvs:[],nt:["Welcome to the demo dashboards."],bk:[
+{id:1,pid:"pro-1-0",svc:"Standard job",date:"2026-11-10",note:"Outlet in the kitchen stopped working.",st:"completed",who:"You"},
+{id:2,pid:"pro-2-1",svc:"Quick visit",date:"2026-12-07",note:"Deep clean before guests arrive.",st:"pending",who:"You"},
+{id:3,pid:"pro-0-0",svc:"Quick visit",date:"2026-12-05",note:"Dripping tap in the bathroom.",st:"pending",who:"Sample customer A"},
+{id:4,pid:"pro-0-0",svc:"Standard job",date:"2026-12-09",note:"Replace a kitchen faucet.",st:"pending",who:"Sample customer B"}]};
+function rs(v){v=(v||'').trim();if(!v)return;S.rs=S.rs.filter(function(x){return x.toLowerCase()!==v.toLowerCase()});S.rs.unshift(v);S.rs=S.rs.slice(0,5)}
+function P(id){return ALL.filter(function(x){return x.id===id})[0]}
+function note(t){S.nt.unshift(t)}
+function stat(n,l){return'<div class="card"><b>'+n+'</b><span class="note">'+l+'</span></div>'}
+function ntf(){return S.nt.slice(0,6).map(function(t){return'<div class="row">'+esc(t)+'</div>'}).join("")}
+function blk(t,b){return'<div class="card pblock"><h3>'+t+'</h3>'+b+'</div>'}
+function bkRow(b,m){var p=P(b.pid),a="",id=' data-b="'+b.id+'"';
+ if(m==="p"&&b.st==="pending")a='<button class="btn small" data-a="acc"'+id+'>Accept</button><button class="btn small ghost" data-a="dec"'+id+'>Decline</button><input type="date" min="'+TD+'" id="alt'+b.id+'" aria-label="Alternative date"><button class="btn small ghost" data-a="prop"'+id+'>Propose date</button>';
+ if(m==="p"&&b.st==="accepted")a='<button class="btn small" data-a="done"'+id+'>Mark completed</button>';
+ if(m==="c"&&b.st==="completed"&&!b.rv)a='<select id="rr'+b.id+'" aria-label="Rating"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select><input id="rt'+b.id+'" placeholder="Write a short review" style="flex:1;min-width:150px" aria-label="Review"><button class="btn small" data-a="rev"'+id+'>Submit review</button>';
+ if(m==="c"&&b.st==="proposed")a='<button class="btn small" data-a="cacc"'+id+'>Accept new date</button><button class="btn small ghost" data-a="cdec"'+id+'>Decline</button>';
+ return'<div class="row" style="display:block"><strong>'+(m==="c"?'<a href="#'+p.id+'">'+esc(p.b)+'</a>':esc(b.who))+'</strong> <span class="tag">'+ST[b.st]+'</span><p class="muted">'+esc(b.svc)+' \u00b7 '+b.date+'<br>'+esc(b.note)+(b.alt?'<br>Proposed date: '+b.alt:'')+'</p>'+(b.rv?'<p class="note">Your review ('+b.rv.r+' stars): '+esc(b.rv.t)+'</p>':'')+(a?'<div class="acts">'+a+'</div>':'')+'</div>'}
+function renderDash(h){
+ var c=h==="customer-demo",o='<div class="banner">Demo dashboard: everything here lives only in this browser tab. Nothing is saved or sent. <a href="#'+(c?'provider-demo">Switch to provider view':'customer-demo">Switch to customer view')+'</a></div>';
+ if(c){
+  var my=S.bk.filter(function(b){return b.who==="You"}),n=function(f){return my.filter(f).length},sv=Object.keys(S.saved),
+  rec=ALL.slice().sort(function(a,b){return b.r-a.r}).filter(function(p){return!S.saved[p.id]}).slice(0,3);
+  o+='<h1 style="font-size:clamp(1.8rem,4vw,2.6rem)">Welcome back</h1><p class="sub">Track your requests and saved professionals.</p><div class="stats">'+stat(n(function(b){return b.st==="pending"||b.st==="proposed"}),"Active requests")+stat(n(function(b){return b.st==="accepted"}),"Upcoming bookings")+stat(sv.length,"Saved professionals")+'</div><p><a class="btn" href="#browse">Find a professional</a></p>'+
+  '<div class="pgrid" style="margin-top:20px"><div>'+blk("Your requests and bookings",my.length?my.map(function(b){return bkRow(b,"c")}).join(""):'<p class="empty">No requests yet. Open a provider profile and send a booking request.</p>')+'</div><div>'+
+  blk("Saved professionals",sv.length?sv.map(function(i){return'<div class="row"><a href="#'+i+'">'+esc(P(i).b)+'</a><button class="btn small ghost" data-a="unsave" data-i="'+i+'">Remove</button></div>'}).join(""):'<p class="empty">Nothing saved yet.</p>')+
+  blk("Recent searches",S.rs.length?'<div class="acts">'+S.rs.map(function(t){return'<button class="chip" data-a="rs" data-i="'+esc(t)+'">'+esc(t)+'</button>'}).join("")+'</div>':'<p class="empty">Searches you make on the home page appear here.</p>')+blk("Recommended",rec.map(function(p){return'<div class="row"><a href="#'+p.id+'">'+esc(p.b)+'</a><button class="btn small ghost" data-a="save" data-i="'+p.id+'">Save</button></div>'}).join(""))+blk("Notifications",ntf())+'</div></div>';
+ }else{
+  var p=P(S.cur),sv=S.sv[p.id]||(S.sv[p.id]=[["Quick visit",p.p],["Standard job",p.p*2],["Full project",p.p*5]].map(function(x){return{n:x[0],p:x[1],on:1}})),
+  rq=S.bk.filter(function(b){return b.pid===p.id}),k=[["photo","Profile photo"],["bio","Business description"],["services","Services and prices"],["portfolio","Portfolio images"],["coverage","Service area"]],
+  dn=k.filter(function(x){return S.pf[x[0]]}).length,ac=rq.filter(function(b){return b.st==="accepted"||b.st==="completed"}).length,dc=rq.filter(function(b){return b.st==="declined"}).length;
+  o+='<h1 style="font-size:clamp(1.8rem,4vw,2.6rem)">'+esc(p.b)+'</h1><label style="max-width:360px;margin:12px 0">Viewing provider (demo)<select id="pick">'+ALL.map(function(x){return'<option value="'+x.id+'"'+(x.id===p.id?' selected':'')+'>'+esc(x.b)+'</option>'}).join("")+'</select></label><div class="stats">'+
+  stat(rq.filter(function(b){return b.st==="pending"}).length,"New requests")+stat(ac,"Accepted")+stat(dc,"Declined")+stat(ac+dc?Math.round(ac/(ac+dc)*100)+"%":"\u2013","Acceptance rate")+'</div>'+
+  '<div class="pgrid"><div>'+blk("Incoming requests",rq.length?rq.map(function(b){return bkRow(b,"p")}).join(""):'<p class="empty">No requests for this provider yet.</p>')+
+  blk("Your services",sv.length?sv.map(function(s,i){return'<div class="row" style="align-items:center;flex-wrap:wrap"><span>'+s.n+(s.on?'':' <span class="tag">Paused</span>')+'</span><span class="acts" style="margin:0">From $<input type="number" min="0" value="'+s.p+'" data-p="'+i+'" style="width:90px" aria-label="Price for '+s.n+'"><button class="btn small ghost" data-a="pause" data-i="'+i+'">'+(s.on?'Pause':'Resume')+'</button><button class="btn small ghost" data-a="del" data-i="'+i+'">Delete</button></span></div>'}).join(""):'<p class="empty">No services listed.</p>')+'</div><div>'+
+  blk("Profile completion ("+Math.round(dn/k.length*100)+"%)",'<div class="prog"><i style="width:'+dn/k.length*100+'%"></i></div>'+k.map(function(x){return'<label class="chk2"><input type="checkbox" data-f="'+x[0]+'"'+(S.pf[x[0]]?' checked':'')+'>'+x[1]+'</label>'}).join(""))+blk("Notifications",ntf())+'</div></div>';
+ }
+ VD.innerHTML=o}
+VD.addEventListener("click",function(e){var b=e.target.closest("button[data-a]");if(!b)return;var a=b.dataset.a,i=b.dataset.i,k=b.dataset.b&&S.bk.filter(function(x){return x.id==b.dataset.b})[0];
+ if(k){var p=P(k.pid);
+  if(a==="acc"){k.st="accepted";note(p.b+" accepted "+k.who+"\u2019s request for "+k.date+".")}
+  else if(a==="dec"){k.st="declined";note(p.b+" declined "+k.who+"\u2019s request.")}
+  else if(a==="prop"){var d=VD.querySelector("#alt"+k.id);if(!d.value){d.focus();return}k.alt=d.value;k.st="proposed";note(p.b+" proposed "+d.value+" to "+k.who+".")}
+  else if(a==="done"){k.st="completed";note(p.b+" marked "+k.who+"\u2019s job as completed.")}else if(a==="rev"){var tx=VD.querySelector("#rt"+k.id),rt=VD.querySelector("#rr"+k.id).value;if(!tx.value.trim()){tx.focus();return}k.rv={r:+rt,t:tx.value.trim()};S.rvs.unshift({pid:k.pid,r:+rt,t:k.rv.t});note("You reviewed "+p.b+" ("+rt+" stars).")}else if(a==="cacc"){k.date=k.alt;k.alt="";k.st="accepted";note(k.who+" accepted the new date with "+p.b+".")}
+  else if(a==="cdec"){k.alt="";k.st="declined";note(k.who+" declined the new date with "+p.b+".")}}
+ else if(a==="rs"){F.cat="";var v=i.toLowerCase();C.forEach(function(c,x){if(!F.cat&&(c[0]+" "+c[3]).toLowerCase().indexOf(v)>-1)F.cat=String(x)});location.hash="browse";return}else if(a==="save")S.saved[i]=1;else if(a==="unsave")delete S.saved[i];
+ else{var l=S.sv[S.cur];if(a==="pause")l[+i].on=!l[+i].on;else if(a==="del")l.splice(+i,1)}
+ renderDash(location.hash.slice(1))});
+VD.addEventListener("change",function(e){var t=e.target;
+ if(t.id==="pick")S.cur=t.value;else if(t.dataset.p)S.sv[S.cur][+t.dataset.p].p=Math.max(0,+t.value||0);else if(t.dataset.f)S.pf[t.dataset.f]=t.checked?1:0;else return;
+ renderDash(location.hash.slice(1))});
+var BSC=0;function jump(y){scrollTo({top:y,behavior:'instant'})}function foc(){var x=document.querySelector('main:not([hidden]) h1');if(x){x.tabIndex=-1;x.focus({preventScroll:true})}}
+function route(){var wasB=!VB.hidden,wasP=!VP.hidden;if(wasB)BSC=scrollY;
+  var h=location.hash.slice(1),p=null;ALL.forEach(function(x){if(x.id===h)p=x});
+  document.title=p?p.b+" – Doorstep (sample)":h==="browse"?"Explore professionals – Doorstep":"Doorstep – Find the right professional";var dsh=h==="customer-demo"||h==="provider-demo";HM.hidden=!!(p||dsh||h==="browse");VB.hidden=h!=="browse";VP.hidden=!p;VD.hidden=!dsh;if(dsh){document.title="Dashboard (demo) – Doorstep";renderDash(h);jump(0);foc();return}
+  if(h==="browse"){renderBrowse();jump(wasP?BSC:0);foc()}else if(p){renderPro(p);jump(0);foc()}else if(h){var el=$(h);if(el)el.scrollIntoView()}
+}
+addEventListener("hashchange",route);
+q.value="Plumbing";run();route();
+var role="customer";
+function setRole(r){role=r;
+  ["customer","provider"].forEach(function(x){document.getElementById("t-"+x).setAttribute("aria-selected",x===r)});
+  document.getElementById("svcLabel").textContent=r==="customer"?"Service you need":"Main service you offer";
+  document.getElementById("bizWrap").hidden=r!=="provider";
+  document.getElementById("submit").textContent=r==="customer"?"Notify me":"Notify me as a provider";
+  document.getElementById("form").hidden=false;document.getElementById("ok").hidden=true}
+document.querySelectorAll("[data-role]").forEach(function(el){el.addEventListener("click",function(){setRole(el.getAttribute("data-role"))})});
+document.getElementById("form").addEventListener("submit",function(e){e.preventDefault();
+  var f=e.target,ok=document.getElementById("ok");
+  ok.textContent="Thanks, "+f.elements.name.value.trim()+". This is a preview, so nothing was saved yet. Once registration is live, you’ll be able to sign up here.";
+  f.hidden=true;ok.hidden=false});
+})();
+</script>
+</body>
+</html>
