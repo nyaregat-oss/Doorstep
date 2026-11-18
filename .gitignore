@@ -1,5 +1,5 @@
 node_modules/
-.deps-repair/
+.deps-repair*/
 .next/
 coverage/
 playwright-report/
