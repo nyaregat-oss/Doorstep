@@ -93,8 +93,11 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
       const weekdays = availability === 'today' ? [today]
         : availability === 'tomorrow' ? [tomorrow]
           : availability === 'weekends' ? [0, 6]
-            : [0, 1, 2, 3, 4, 5, 6];
-      const availabilityResult = await supabase.from('availability').select('provider_id').eq('is_open', true).in('weekday', weekdays);
+            : Array.from({ length: 7 - today }, (_, offset) => (today + offset) % 7);
+      let availabilityQuery = supabase.from('availability').select('provider_id').eq('is_open', true);
+      if (availability === 'this-week') availabilityQuery = availabilityQuery.gte('weekday', today);
+      else availabilityQuery = availabilityQuery.in('weekday', weekdays);
+      const availabilityResult = await availabilityQuery;
       availabilityError = Boolean(availabilityResult.error);
       availableProviderIds = [...new Set((availabilityResult.data || []).map((slot) => slot.provider_id))];
     }

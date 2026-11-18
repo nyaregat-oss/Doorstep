@@ -135,6 +135,7 @@ begin
         ))
         or (p_availability = 'this-week' and exists (
           select 1 from public.availability a where a.provider_id = p.profile_id and a.is_open
+            and a.weekday >= extract(dow from pg_catalog.timezone('Africa/Nairobi', now()))::integer
         ))
       )
   )
