@@ -6,13 +6,15 @@ import { deleteServiceAction, saveProviderProfileAction, saveServiceAction, setS
 import { AvailabilityManager } from './availability-manager';
 import { PortfolioManager } from './portfolio-manager';
 import { markNotificationReadAction, respondToBookingAction, sendMessageAction, sendQuotationAction } from '@/app/booking-actions';
+import { roundToApproximate } from '@/lib/location';
 
 type Category = { id: string; name: string };
 type Service = { id: string; name: string; description: string; starting_price: number; currency: string; active: boolean };
 type ProviderProfile = { profile_id: string; business_name: string; category_id: string | null; location: string; bio: string; years_experience: number };
 
-export function ProviderDashboard({ profile, categories, services, categoryError, categoryReviewState, requiredVerificationKinds, databaseError, portfolio, portfolioError, availability, availabilityError, bookings = [], bookingsError = false, notifications = [] }: {
+export function ProviderDashboard({ profile, serviceCenter, categories, services, categoryError, categoryReviewState, requiredVerificationKinds, databaseError, portfolio, portfolioError, availability, availabilityError, bookings = [], bookingsError = false, notifications = [] }: {
   profile: ProviderProfile;
+  serviceCenter: { latitude: number; longitude: number } | null;
   categories: Category[];
   services: Service[];
   categoryError: boolean;
@@ -30,6 +32,7 @@ export function ProviderDashboard({ profile, categories, services, categoryError
   const router = useRouter();
   const [busy, startTransition] = useTransition();
   const [feedback, setFeedback] = useState('');
+  const [locationSetupFeedback, setLocationSetupFeedback] = useState('');
   const [editing, setEditing] = useState<string | null>(null);
   const activeCount = services.filter((service) => service.active).length;
   const formatDate = (value: string) => new Intl.DateTimeFormat('en-KE', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Nairobi' }).format(new Date(value));
@@ -89,9 +92,26 @@ export function ProviderDashboard({ profile, categories, services, categoryError
       <div className="panel-heading"><div><h2>Business profile</h2><p className="muted">This information appears on your professional profile.</p></div></div>
       {categoryError && <p className="auth-error" role="alert">Service categories could not load. Apply the database migration and try again.</p>}
       <form className="provider-fields" onSubmit={submit(saveProviderProfileAction)}>
+        <input type="hidden" name="service_center_exists" value={serviceCenter ? 'true' : 'false'}/>
         <label>Business name<input name="business_name" minLength={2} maxLength={120} defaultValue={profile.business_name} required/></label>
         <label>Main service<select name="category_id" defaultValue={profile.category_id || ''}><option value="">Choose a category</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
         <label>County, town, or area<input name="location" minLength={2} maxLength={160} defaultValue={profile.location} placeholder="e.g. Westlands, Nairobi" required/></label>
+        <label>Approximate service-area latitude<input name="service_latitude" type="number" min="-90" max="90" step="0.01" defaultValue={serviceCenter?.latitude ?? ''} placeholder="Optional"/></label>
+        <label>Approximate service-area longitude<input name="service_longitude" type="number" min="-180" max="180" step="0.01" defaultValue={serviceCenter?.longitude ?? ''} placeholder="Optional"/></label>
+        <p className="note wide">Use an approximate public service-area center, not your home or a customer address. Coordinates are rounded to about 1 km and kept private; nearby search returns distance only.</p>
+        <div className="wide acts"><button className="btn ghost small" type="button" onClick={(event) => {
+          const form = event.currentTarget.form;
+          if (!navigator.geolocation || !form) { setLocationSetupFeedback('Location access is unavailable. You can enter an approximate center manually.'); return; }
+          setLocationSetupFeedback('Waiting for location permission…');
+          navigator.geolocation.getCurrentPosition((position) => {
+            const latitude = roundToApproximate(position.coords.latitude, -90, 90);
+            const longitude = roundToApproximate(position.coords.longitude, -180, 180);
+            if (latitude === null || longitude === null) { setLocationSetupFeedback('We could not read a valid location. Enter an approximate center manually.'); return; }
+            (form.elements.namedItem('service_latitude') as HTMLInputElement).value = String(latitude);
+            (form.elements.namedItem('service_longitude') as HTMLInputElement).value = String(longitude);
+            setLocationSetupFeedback('Approximate coordinates added. Check that they represent your service area, then save.');
+          }, () => setLocationSetupFeedback('Location was not shared. You can enter an approximate center manually.'), { enableHighAccuracy: false, maximumAge: 60000, timeout: 10000 });
+        }}>Set approximate center from my location</button><span className="muted" role="status">{locationSetupFeedback}</span></div>
         <label>Years of experience<input name="years_experience" type="number" min="0" max="80" step="1" defaultValue={profile.years_experience} required/></label>
         <label className="wide">About your business<textarea name="bio" maxLength={2000} rows={4} defaultValue={profile.bio} placeholder="Describe the work you do and what customers can expect."/></label>
         <button className="btn" type="submit" disabled={busy}>{busy ? 'Saving…' : 'Save profile'}</button>

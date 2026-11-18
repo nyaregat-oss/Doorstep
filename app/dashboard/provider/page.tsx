@@ -14,7 +14,7 @@ export default async function ProviderPage() {
   const { data: account } = await supabase.from('profiles').select('role, full_name').eq('id', user.id).maybeSingle();
   if (account?.role !== 'provider') redirect('/dashboard/customer');
 
-  const [providerResult, categoriesResult, servicesResult, portfolioResult, availabilityResult, bookingsResult, notificationsResult] = await Promise.all([
+  const [providerResult, categoriesResult, servicesResult, portfolioResult, availabilityResult, bookingsResult, notificationsResult, serviceCenterResult] = await Promise.all([
     supabase.from('provider_profiles').select('profile_id, business_name, category_id, location, bio, years_experience').eq('profile_id', user.id).maybeSingle(),
     supabase.from('categories').select('id, name').eq('active', true).order('sort_order'),
     supabase.from('services').select('id, name, description, starting_price, currency, active').eq('provider_id', user.id).order('created_at', { ascending: false }),
@@ -22,6 +22,7 @@ export default async function ProviderPage() {
     supabase.from('availability').select('weekday, is_open, start_time, end_time').eq('provider_id', user.id).order('weekday'),
     supabase.from('bookings').select('id, customer_id, customer_display_name, request_kind, description, location, preferred_at, proposed_at, status, created_at, services(name), messages(id, sender_id, recipient_id, body, created_at), quotations(id, amount, currency, message, status)').eq('provider_id', user.id).order('created_at', { ascending: false}),
     supabase.from('notifications').select('id, body, read_at, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
+    supabase.from('provider_service_centers').select('latitude, longitude').eq('provider_id', user.id).maybeSingle(),
   ]);
 
   if (!providerResult.data) {
@@ -35,6 +36,7 @@ export default async function ProviderPage() {
   return <>
     <ProviderDashboard
       profile={providerResult.data}
+      serviceCenter={serviceCenterResult.data || null}
       categories={categoriesResult.data || []}
       services={servicesResult.data || []}
       categoryError={Boolean(categoriesResult.error)}

@@ -2,6 +2,7 @@ import { categories as sampleCategories } from '@/lib/catalog';
 import { getSampleProviders, sampleAreas } from '@/lib/marketplace-data';
 import { createClient } from '@/lib/supabase/server';
 import type { Metadata } from 'next';
+import { NearbyResults } from './nearby-results';
 
 export const metadata: Metadata = { title: 'Browse services | Doorstep', description: 'Search sample and live provider services across Kenya.' };
 
@@ -177,6 +178,8 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
       <label>Sort by<select name="sort" defaultValue={priceSort ? 'price' : 'newest'}><option value="newest">Recently added</option><option value="price">Lowest price</option></select></label>
       <div className="browse-actions"><button className="btn" type="submit">Search</button><a className="btn ghost" href="/browse">Clear filters</a></div>
     </form>
+
+    <NearbyResults configured={configured} query={q} location={safeText(params.location)} category={category} maxPrice={maxPrice} availability={availability}/>
 
     {configured && <section className="browse-results-section"><div className="panel-heading"><div><h2>Live provider listings</h2><p className="muted">{liveTotal} live services match these filters.</p></div><span className="browse-page-label">Page {livePage} of {livePageCount}</span></div>
       {liveError && <p className="auth-error" role="alert">Live listings, categories, or availability could not load. Apply the database migrations and check your Supabase setup.</p>}

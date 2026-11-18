@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { isCurrencyCode, parseStartingPrice } from '@/lib/marketplace-validation';
+import { parseApproximateCoordinatePair } from '@/lib/location';
 
 export type ProviderActionResult = { error?: string; message?: string };
 
@@ -21,9 +22,12 @@ export async function saveProviderProfileAction(formData: FormData): Promise<Pro
   const location = String(formData.get('location') || '').trim();
   const bio = String(formData.get('bio') || '').trim();
   const yearsExperience = Number(formData.get('years_experience') || 0);
+  const hadServiceCenter = formData.get('service_center_exists') === 'true';
+  const center = parseApproximateCoordinatePair(formData.get('service_latitude'), formData.get('service_longitude'));
   if (businessName.length < 2 || businessName.length > 120 || location.length < 2 || location.length > 160 || bio.length > 2000 || !Number.isInteger(yearsExperience) || yearsExperience < 0 || yearsExperience > 80) {
     return { error: 'Check the business name, location, description, and experience fields.' };
   }
+  if (center.error) return { error: center.error };
 
   try {
     const context = await getProviderContext();
@@ -32,8 +36,19 @@ export async function saveProviderProfileAction(formData: FormData): Promise<Pro
       business_name: businessName, category_id: categoryId, location, bio, years_experience: yearsExperience,
     }).eq('profile_id', context.providerId).select('profile_id').maybeSingle();
     if (error || !data) return { error: 'We could not save your profile. Check that the database migration is applied and try again.' };
+    const centerResult = center.coordinates
+      ? await context.supabase.from('provider_service_centers').upsert({
+        provider_id: context.providerId,
+        latitude: center.coordinates.latitude,
+        longitude: center.coordinates.longitude,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'provider_id' })
+      : hadServiceCenter
+        ? await context.supabase.from('provider_service_centers').delete().eq('provider_id', context.providerId)
+        : { error: null };
     revalidatePath('/dashboard/provider');
     revalidatePath('/browse');
+    if (centerResult.error) return { error: 'Your profile was saved, but the approximate service-area center was not. Apply the nearby-discovery migration and try again.' };
     return { message: 'Business profile saved.' };
   } catch {
     return { error: 'We could not reach the database. Check your Supabase setup and try again.' };
