@@ -13,10 +13,16 @@ Doorstep is a two-sided service marketplace. The landing page and illustrative p
 ```sh
 npm install
 cp .env.example .env.local
+npx supabase start
+npx supabase status -o env
 npm run dev
 ```
 
-Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_SITE_URL` in `.env.local`. Apply the SQL files in `supabase/migrations` in filename order. Enable email confirmations in Supabase Auth and add `http://localhost:3000/auth/callback` to the allowed redirect URLs. For production, set the site URL and redirect allowlist to the deployed origin.
+Requirements for the local backend are the Supabase CLI and Docker Desktop. The local Supabase stack runs Postgres, Auth, Storage, Studio, and an email inbox for confirmation links. Copy the `API_URL` and `ANON_KEY` values printed by `npx supabase status -o env` into `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`; do not copy a service-role key into a `NEXT_PUBLIC_` variable. `supabase/config.toml` enables email confirmation and local mail capture. The email inbox is available at http://127.0.0.1:54324.
+
+`supabase db reset` applies all migrations and seeds the 16 service categories. Set `NEXT_PUBLIC_SITE_URL=http://localhost:3000` for ordinary development. For a separately hosted project, apply the SQL files in `supabase/migrations` in filename order, configure email confirmation, and add the callback URL to the Auth redirect allowlist. Use a test project for automated sign-ups; do not run E2E tests against production.
+
+`LAUNCH_GATE` defaults to `true` when unset. It shows the pre-launch notice and disables credential-record/document submissions. Only the owner should set it to `false`, after legal review. Payment collection is not implemented. Do not store identity or other sensitive documents in the portfolio bucket.
 
 Open http://localhost:3000. If Supabase is not configured, the auth routes explain which settings are needed. No secrets belong in the repository.
 
@@ -51,9 +57,10 @@ npm run typecheck
 npm test
 npx playwright install chromium
 npm run test:e2e
+npx supabase test db
 ```
 
-The Playwright landing-page check covers 320px and 1440px widths in light and dark themes. It checks horizontal overflow and browser console errors.
+The Playwright checks cover auth screen behavior plus 320px, 390px, 820px, and 1440px widths in light and dark themes, horizontal overflow, and browser console errors. Real registration and email-confirmation E2E cases run when `.env.local` has a test Supabase URL/key and `E2E_MAILBOX_URL` points to the local inbox. The Phase 2 RLS assertions are in `supabase/tests/phase2_auth_rls.test.sql`; compliance and nearby-discovery policy checks are in their corresponding SQL test files. SQL tests require the local Supabase stack.
 
 ## Stack
 

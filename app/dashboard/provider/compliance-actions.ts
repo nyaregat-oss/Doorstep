@@ -3,8 +3,13 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { isLaunchGateEnabled } from '@/lib/launch-gate';
 
 export async function submitVerificationAction(formData: FormData) {
+  // Credential evidence contains sensitive personal data. Keep the upload path
+  // closed until the owner turns off LAUNCH_GATE after legal review.
+  if (isLaunchGateEnabled()) redirect('/dashboard/provider/compliance?error=launch_gate');
+
   const kind = String(formData.get('kind') || '');
   const issuer = String(formData.get('issuing_authority') || '').trim();
   const credential = String(formData.get('credential_name') || '').trim();
