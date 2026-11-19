@@ -50,7 +50,10 @@ export default async function ProviderProfilePage({ params }: { params: Promise<
   const supabase = await createClient();
   const { data: rawProfile, error } = await supabase.from('provider_profiles').select('profile_id, business_name, location, bio, years_experience, categories(name)').eq('profile_id', id).maybeSingle();
   if (error || !rawProfile) notFound();
-  const profile = rawProfile as LiveProfile;
+  const profile = {
+    ...rawProfile,
+    categories: Array.isArray(rawProfile.categories) ? rawProfile.categories[0] || null : rawProfile.categories,
+  } as LiveProfile;
   const [servicesResult, portfolioResult, availabilityResult] = await Promise.all([
     supabase.from('services').select('id, name, description, starting_price, currency').eq('provider_id', id).eq('active', true).order('created_at', { ascending: false }),
     supabase.from('portfolio_items').select('id, storage_path, caption').eq('provider_id', id).order('sort_order').order('created_at'),

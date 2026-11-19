@@ -1,6 +1,8 @@
 node_modules/
-.deps-repair*/
+.deps-*/
+.next-swc-cache/
 .next/
+*.tsbuildinfo
 coverage/
 playwright-report/
 test-results/

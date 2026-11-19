@@ -38,7 +38,7 @@ export async function registerAction(_state: FormState, formData: FormData): Pro
     },
   }).catch(() => ({ error: new Error('Authentication service unavailable') }));
   if (error) return { error: 'We could not create the account with those details. Check the information and try again.' };
-  redirect('/login?checkEmail=1');
+  return redirect('/login?checkEmail=1');
 }
 
 export async function loginAction(_state: FormState, formData: FormData): Promise<FormState> {
@@ -50,7 +50,7 @@ export async function loginAction(_state: FormState, formData: FormData): Promis
   const { data, error } = await supabase.auth.signInWithPassword({ email, password }).catch(() => ({ data: { user: null }, error: new Error('Authentication service unavailable') }));
   if (error || !data.user) return { error: 'Email or password is incorrect, or the email has not been verified.' };
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).maybeSingle();
-  redirect(profile?.role === 'provider' ? '/dashboard/provider' : '/dashboard/customer');
+  return redirect(profile?.role === 'provider' ? '/dashboard/provider' : '/dashboard/customer');
 }
 
 export async function requestPasswordResetAction(_state: FormState, formData: FormData): Promise<FormState> {

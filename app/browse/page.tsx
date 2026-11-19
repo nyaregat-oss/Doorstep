@@ -14,12 +14,12 @@ type BrowseService = {
   starting_price: number | string;
   currency: string;
   created_at: string;
-  provider_profiles: {
+  provider_profiles: Array<{
     profile_id: string;
     business_name: string;
     location: string;
-    categories: { name: string } | null;
-  };
+    categories: { name: string }[] | { name: string } | null;
+  }>;
 };
 type Listing = {
   id: string;
@@ -117,20 +117,25 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
     const serviceResult = await query.order(priceSort ? 'starting_price' : 'created_at', { ascending: priceSort }).range((livePage - 1) * pageSize, livePage * pageSize - 1);
     liveError = Boolean(categoryResult.error || availabilityError || serviceResult.error);
     liveTotal = serviceResult.count || 0;
-    liveListings = ((serviceResult.data || []) as BrowseService[]).map((service) => ({
-      id: service.id,
-      providerId: service.provider_profiles.profile_id,
-      businessName: service.provider_profiles.business_name,
-      serviceName: service.name,
-      description: service.description,
-      location: service.provider_profiles.location,
-      category: service.provider_profiles.categories?.name || 'Other service',
-      price: Number(service.starting_price),
-      currency: service.currency,
-      source: 'live',
-      availability: '',
-      availabilityKey: '',
-    }));
+    liveListings = ((serviceResult.data || []) as unknown as BrowseService[]).flatMap((service) => {
+      const provider = service.provider_profiles[0];
+      if (!provider) return [];
+      const joinedCategory = Array.isArray(provider.categories) ? provider.categories[0] : provider.categories;
+      return [{
+        id: service.id,
+        providerId: provider.profile_id,
+        businessName: provider.business_name,
+        serviceName: service.name,
+        description: service.description,
+        location: provider.location,
+        category: joinedCategory?.name || 'Other service',
+        price: Number(service.starting_price),
+        currency: service.currency,
+        source: 'live' as const,
+        availability: '',
+        availabilityKey: '',
+      }];
+    });
   }
 
   const matches = (listing: Listing) => {
