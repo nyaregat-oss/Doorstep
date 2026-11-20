@@ -76,8 +76,14 @@ export async function updatePasswordAction(_state: FormState, formData: FormData
 }
 
 export async function logoutAction() {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
-  if (error) redirect('/login?signout=0');
+  let failed = false;
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signOut();
+    failed = Boolean(error);
+  } catch {
+    failed = true;
+  }
+  if (failed) redirect('/login?signout=0');
   redirect('/');
 }
