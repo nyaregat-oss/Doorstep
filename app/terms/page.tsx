@@ -1,24 +1,77 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
+import { ArrowLeft, FileText } from 'lucide-react';
 
-export const metadata: Metadata = { title: 'Marketplace information | Doorstep' };
+export const metadata: Metadata = { title: 'Marketplace Terms & Information | Doorstep' };
 
 export default function TermsPage() {
-  return <main className="wrap auth-wrap">
-    <a className="logo" href="/"><i/>Doorstep</a>
-    <section className="card auth-card">
-      <p className="eyebrow">Marketplace information · pre-launch draft</p>
-      <h1>Before you make a service agreement</h1>
-      <p>This page describes the current prototype and is not Doorstep’s final customer or provider agreement. Kenyan counsel must approve the marketplace roles, provider terms, cancellation and refund rules, consumer disclosures, and worker relationship before live jobs begin.</p>
-      <h2>Quotes and scope</h2>
-      <p>A starting price is an estimate from a listing, not a final price. Before agreeing to work, the customer and provider should record the task scope, parts and labour, total price and any taxes or additional fees, timing, materials, and cancellation/rescheduling terms.</p>
-      <h2>Requests and cancellation in this prototype</h2>
-      <p>A booking or quotation request is not a payment. The customer may cancel a pending or accepted request from the customer workspace. The current prototype does not collect money, issue refunds, or provide escrow. It has no final cancellation or refund policy for work that has started; that policy must be approved before launch.</p>
-      <h2>Provider roles and responsibility</h2>
-      <p>The “provider” account type is a marketplace role in the prototype. It does not determine whether a person is an employee, independent provider, agent, or another legal category. Doorstep does not guarantee a service outcome, professional licence, insurance cover, or safety. Category and licence checks are not yet approved for live work.</p>
-      <h2>Safety and complaints</h2>
-      <p>Do not accept work beyond your training, licence, or safe working conditions. Stop work if an immediate hazard arises. Use the <a href="/report">report form</a> to record a safety issue or complaint; it is not an emergency response service.</p>
-      <p className="note">This draft must not be used as a substitute for final platform terms or consumer disclosures. Doorstep remains in development and live service categories are disabled until compliance review is recorded.</p>
-      <a className="auth-link" href="/privacy">Read the pre-launch privacy information</a>
-    </section>
-  </main>;
+  return (
+    <main className="ds-container ds-prose-wrap">
+      <Link className="ds-back-link" href="/">
+        <ArrowLeft size={15} aria-hidden="true" />
+        Back to Doorstep
+      </Link>
+
+      <section className="ds-card ds-prose-card">
+        <span className="ds-eyebrow">
+          <FileText size={14} aria-hidden="true" />
+          Marketplace information · pre-launch draft
+        </span>
+        <h1>Before you make a service agreement</h1>
+        <p className="ds-muted">
+          This page describes the current Doorstep prototype and is not Doorstep&apos;s final customer or provider
+          agreement. Kenyan legal counsel must approve final marketplace roles, consumer disclosures, cancellation and
+          refund policies, and worker terms before live commercial jobs begin.
+        </p>
+
+        <div className="ds-prose-section">
+          <h2>Quotes and job scope</h2>
+          <p>
+            A starting price shown on a service listing is an estimate, not a final binding price. Before confirming
+            work, customers and providers should confirm task scope, parts and labour, total KES amount, any additional
+            fees, timing, and rescheduling expectations inside their request thread.
+          </p>
+        </div>
+
+        <div className="ds-prose-section">
+          <h2>Requests, payments &amp; cancellation</h2>
+          <p>
+            Submitting a booking or quotation request does not charge your account or M-Pesa wallet. Customers may cancel
+            pending or accepted requests from their customer workspace. Doorstep does not currently process payments,
+            hold escrow, or issue refunds.
+          </p>
+        </div>
+
+        <div className="ds-prose-section">
+          <h2>Provider independence &amp; responsibility</h2>
+          <p>
+            The &ldquo;provider&rdquo; account type identifies service sellers on the platform and does not create an
+            employment or agency relationship. Doorstep does not guarantee service outcomes or professional competence;
+            verified badges appear only where compliance staff have approved submitted credentials.
+          </p>
+        </div>
+
+        <div className="ds-prose-section">
+          <h2>Safety &amp; reporting</h2>
+          <p>
+            Never proceed with work beyond your licence, training, or safe working conditions. Stop work immediately if
+            an environmental or electrical hazard arises. Use our{' '}
+            <Link href="/report" style={{ textDecoration: 'underline', fontWeight: 600 }}>
+              safety report centre
+            </Link>{' '}
+            to log concerns — for immediate emergencies, contact local Kenyan emergency services first.
+          </p>
+        </div>
+
+        <div className="ds-actions-row" style={{ paddingTop: 8 }}>
+          <Link className="ds-btn ds-btn-secondary ds-btn-sm" href="/privacy">
+            Read privacy information
+          </Link>
+          <Link className="ds-btn ds-btn-ghost ds-btn-sm" href="/browse">
+            Explore services
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
 }

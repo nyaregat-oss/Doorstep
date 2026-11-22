@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { Compass, MapPin, Navigation } from 'lucide-react';
 import { createBrowserSupabaseClient } from '@/lib/supabase/browser';
 import { roundToApproximate } from '@/lib/location';
+import { ProfessionalCard } from '@/components/cards/professional-card';
 
 type NearbyService = {
   service_id: string;
@@ -17,7 +19,14 @@ type NearbyService = {
   distance_km: number | string;
 };
 
-export function NearbyResults({ configured, query, location, category, maxPrice, availability }: {
+export function NearbyResults({
+  configured,
+  query,
+  location,
+  category,
+  maxPrice,
+  availability,
+}: {
   configured: boolean;
   query: string;
   location: string;
@@ -25,6 +34,7 @@ export function NearbyResults({ configured, query, location, category, maxPrice,
   maxPrice?: number;
   availability: string;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const [radius, setRadius] = useState(10);
   const [results, setResults] = useState<NearbyService[]>([]);
   const [searched, setSearched] = useState(false);
@@ -59,7 +69,7 @@ export function NearbyResults({ configured, query, location, category, maxPrice,
       if (error) throw error;
       setResults((data || []) as NearbyService[]);
       setSearched(true);
-      setMessage('Location rounded to an approximate area for this search. It is not saved in your profile.');
+      setMessage('Location rounded to an approximate area for this search and never saved in Doorstep tables.');
     } catch {
       setMessage('Nearby results are unavailable. Apply the nearby-discovery migration and try again.');
     } finally {
@@ -76,7 +86,9 @@ export function NearbyResults({ configured, query, location, category, maxPrice,
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (position) => { void search(position.coords.latitude, position.coords.longitude); },
+      (position) => {
+        void search(position.coords.latitude, position.coords.longitude);
+      },
       () => {
         setBusy(false);
         setMessage('Location was not shared. Use the manual area filter; GPS is optional.');
@@ -85,26 +97,93 @@ export function NearbyResults({ configured, query, location, category, maxPrice,
     );
   }
 
-  const formatPrice = (price: number | string, currency: string) => {
-    try { return new Intl.NumberFormat('en-KE', { style: 'currency', currency, maximumFractionDigits: 0 }).format(Number(price)); }
-    catch { return `${currency} ${Number(price).toLocaleString('en-KE')}`; }
-  };
+  return (
+    <section className="ds-card ds-nearby-box" aria-labelledby="nearby-heading">
+      <div className="ds-nearby-head">
+        <div>
+          <span className="ds-eyebrow" style={{ marginBottom: 4 }}>
+            <Compass size={14} aria-hidden="true" />
+            Optional proximity discovery
+          </span>
+          <h2 id="nearby-heading" style={{ fontSize: '1.25rem' }}>
+            Find services near your current area
+          </h2>
+          <p className="ds-muted" style={{ fontSize: '0.9rem', marginTop: 4 }}>
+            Coordinates are rounded to an approximate ~1 km grid before querying and are not stored.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="ds-btn ds-btn-secondary ds-btn-sm"
+          onClick={() => setExpanded((value) => !value)}
+        >
+          <MapPin size={15} aria-hidden="true" />
+          {expanded ? 'Hide area distance tool' : 'Open distance & radius view'}
+        </button>
+      </div>
 
-  return <section className="browse-results-section nearby-section" aria-labelledby="nearby-heading">
-    <div className="panel-heading"><div><h2 id="nearby-heading">Nearby recommendations</h2><p className="muted">Optional: use your location to rank providers by distance. Doorstep sends coordinates rounded to an approximate area for this search and does not save them in marketplace tables.</p></div></div>
-    <div className="nearby-controls">
-      <label>Search radius<select value={radius} onChange={(event) => { setRadius(Number(event.target.value)); setResults([]); setSearched(false); }}><option value={5}>5 km</option><option value={10}>10 km</option><option value={25}>25 km</option><option value={50}>50 km</option></select></label>
-      <button className="btn" type="button" onClick={useLocation} disabled={busy}>{busy ? 'Finding nearby services…' : 'Use my location'}</button>
-    </div>
-    {message && <p className="note" role="status">{message}</p>}
-    {searched && results.length === 0 && <p className="card browse-empty">No eligible live providers with a service-area center were found within {radius} km. Keep using the manual area search above.</p>}
-    {results.length > 0 && <div className="browse-grid">{results.map((item) => <article className="card browse-card" key={item.service_id}>
-      <div className="browse-card-heading"><div className="av" aria-hidden="true">{item.business_name.trim().slice(0, 1).toUpperCase()}</div><div><p className="eyebrow">{item.category}</p><h3>{item.business_name}</h3></div></div>
-      <p className="browse-service-title">{item.service_name}</p>
-      {item.description && <p className="muted">{item.description}</p>}
-      <p className="browse-location">{item.location} · {Number(item.distance_km).toFixed(1)} km away</p>
-      <p className="browse-price">From {formatPrice(item.starting_price, item.currency)}</p>
-      <div className="browse-card-foot"><span className="tag">Provider listing</span><a className="btn ghost small" href={`/providers/${item.provider_id}`}>View profile</a></div>
-    </article>)}</div>}
-  </section>;
+      {expanded && (
+        <div style={{ display: 'grid', gap: 16 }}>
+          <div className="ds-nearby-controls">
+            <label className="ds-field" style={{ minWidth: 160 }}>
+              Search radius
+              <select
+                className="ds-select"
+                value={radius}
+                onChange={(event) => {
+                  setRadius(Number(event.target.value));
+                  setResults([]);
+                  setSearched(false);
+                }}
+              >
+                <option value={5}>Within 5 km</option>
+                <option value={10}>Within 10 km</option>
+                <option value={25}>Within 25 km</option>
+                <option value={50}>Within 50 km</option>
+              </select>
+            </label>
+            <button className="ds-btn ds-btn-amber" type="button" onClick={useLocation} disabled={busy}>
+              <Navigation size={15} aria-hidden="true" />
+              {busy ? 'Finding nearby services…' : 'Use my location'}
+            </button>
+          </div>
+
+          {message && (
+            <p className="ds-muted" style={{ fontSize: '0.88rem' }} role="status">
+              {message}
+            </p>
+          )}
+
+          {searched && results.length === 0 && (
+            <p className="ds-alert ds-alert-info">
+              No eligible live providers with an approximate service-area center were found within {radius} km.
+            </p>
+          )}
+
+          {results.length > 0 && (
+            <div className="ds-pro-grid">
+              {results.map((item) => (
+                <ProfessionalCard
+                  key={item.service_id}
+                  item={{
+                    id: item.service_id,
+                    providerId: item.provider_id,
+                    businessName: item.business_name,
+                    serviceName: item.service_name,
+                    description: item.description,
+                    location: item.location,
+                    category: item.category,
+                    price: Number(item.starting_price),
+                    currency: item.currency,
+                    source: 'live',
+                    distanceKm: Number(item.distance_km),
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
 }

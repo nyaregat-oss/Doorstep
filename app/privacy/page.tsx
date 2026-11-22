@@ -1,8 +1,11 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
+import { ArrowLeft, Lock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { submitPrivacyRequest } from './actions';
+import { Badge } from '@/components/ui/badge';
 
-export const metadata: Metadata = { title: 'Privacy | Doorstep' };
+export const metadata: Metadata = { title: 'Privacy Information | Doorstep' };
 
 const requestOptions = [
   ['access', 'Access my information'],
@@ -14,7 +17,11 @@ const requestOptions = [
   ['other', 'Other privacy request'],
 ];
 
-export default async function PrivacyPage({ searchParams }: { searchParams: Promise<{ submitted?: string; error?: string }> }) {
+export default async function PrivacyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ submitted?: string; error?: string }>;
+}) {
   const params = await searchParams;
   let user: { id: string } | null = null;
   let requests: Array<{ id: string; request_kind: string; status: string; created_at: string }> = [];
@@ -23,36 +30,156 @@ export default async function PrivacyPage({ searchParams }: { searchParams: Prom
     const auth = await supabase.auth.getUser();
     user = auth.data.user ? { id: auth.data.user.id } : null;
     if (user) {
-      const result = await supabase.from('privacy_requests').select('id, request_kind, status, created_at').order('created_at', { ascending: false }).limit(20);
+      const result = await supabase
+        .from('privacy_requests')
+        .select('id, request_kind, status, created_at')
+        .order('created_at', { ascending: false })
+        .limit(20);
       requests = result.data || [];
     }
-  } catch { /* A static notice remains available before Supabase is configured. */ }
+  } catch {
+    /* Static notice stays available before Supabase is configured. */
+  }
 
-  return <main className="wrap auth-wrap">
-    <a className="logo" href="/"><i/>Doorstep</a>
-    <section className="card auth-card">
-      <p className="eyebrow">Privacy information · pre-launch draft</p>
-      <h1>Your information</h1>
-      <p>This notice describes the prototype as it exists today. It is not a statement that Doorstep is legally compliant. The final controller, processor, lawful-basis, retention, vendor-transfer, and ODPC registration details are still under review; the live service must not launch until those details are settled.</p>
-      <h2>Information used by the prototype</h2>
-      <p>When account features are configured, Doorstep processes account email and the profile details you provide. Provider profiles may include a business name, service area, description, service prices, and availability. A service request can include a preferred time, an area/address, a work description, quotes, and messages between the two participants.</p>
-      <p>These details are used to create accounts, show provider listings, and let the participants manage a service request. The current prototype does not collect payment details or identity-document images. Do not put identity numbers, passwords, health information, or sensitive access details in a public profile or message. Share a precise job address only when it is necessary for the agreed service.</p>
-      <h2>Optional nearby search</h2>
-      <p>If you choose “Use my location” on Browse, your browser provides coordinates which Doorstep rounds to two decimal places and sends to the configured Supabase project to find nearby providers. Doorstep does not save those search coordinates in its marketplace tables. Approximate provider service-area centers are stored privately; search results show distance and do not reveal those coordinates. Hosting, database, and network providers may process request data under their own logs and retention practices; those details still need review before launch.</p>
-      <h2>Where information is stored and how long it is kept</h2>
-      <p>Account and marketplace data use the configured Supabase project. Doorstep has not yet recorded the production hosting region, sub-processors, cross-border transfer safeguards, or a final retention schedule. Those must be documented before real customer or worker data is used.</p>
-      <h2>Your requests</h2>
-      <p>Subject to applicable law, you may ask about access, correction, objection, restriction, portability, or erasure. Submit a request below while signed in. A request is not automatically fulfilled: a reviewer must check identity, applicable legal duties, and any record-retention requirements, then record the outcome.</p>
-      {params.submitted === '1' && <p className="auth-message" role="status">Your request was recorded for review.</p>}
-      {params.error && <p className="auth-error" role="alert">The request could not be recorded. Confirm the compliance migration is applied and try again.</p>}
-      {user ? <form action={submitPrivacyRequest} className="auth-fields">
-        <label>Request type<select name="request_kind" required>{requestOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-        <label>Details (do not include identity numbers or passwords)<textarea name="details" maxLength={1200} rows={4} placeholder="Describe the information or processing you are asking about."/></label>
-        <button className="btn" type="submit">Submit privacy request</button>
-      </form> : <p className="note"><a href="/login">Sign in</a> to submit a request. If you cannot access your account, contact Doorstep through the support channel provided to you.</p>}
-      {requests.length > 0 && <section className="provider-panel"><h2>Your recent requests</h2><ul>{requests.map((request) => <li key={request.id}>{request.request_kind.replaceAll('_', ' ')} · {request.status.replaceAll('_', ' ')} · {new Date(request.created_at).toLocaleDateString('en-KE')}</li>)}</ul></section>}
-      <p className="note">This draft needs a Kenyan privacy review before it is used as Doorstep’s final statutory privacy notice.</p>
-      <a className="auth-link" href="/report">Report a safety issue or complaint</a>
-    </section>
-  </main>;
+  return (
+    <main className="ds-container ds-prose-wrap">
+      <Link className="ds-back-link" href="/">
+        <ArrowLeft size={15} aria-hidden="true" />
+        Back to Doorstep
+      </Link>
+
+      <section className="ds-card ds-prose-card">
+        <span className="ds-eyebrow">
+          <Lock size={14} aria-hidden="true" />
+          Privacy information · pre-launch draft
+        </span>
+        <h1>Your information &amp; privacy rights</h1>
+        <p className="ds-muted">
+          This notice describes the Doorstep prototype as it operates today. It is not a final statutory compliance
+          statement; controller, processor, lawful-basis, retention, vendor-transfer, and ODPC registration details remain
+          under Kenyan legal review prior to public launch.
+        </p>
+
+        <div className="ds-prose-section">
+          <h2>Information used by Doorstep</h2>
+          <p>
+            When Supabase is configured, Doorstep processes account email and the profile details you submit. Provider
+            profiles include a business name, service area, description, starting prices, portfolio images, and weekly
+            hours. Service requests include preferred timing, neighbourhood/area, job description, quotes, and
+            participant messages.
+          </p>
+          <p>
+            Doorstep does not collect online payments or identity-document images in this release. Do not include
+            national ID numbers, passwords, or sensitive health information in profiles or message threads.
+          </p>
+        </div>
+
+        <div className="ds-prose-section">
+          <h2>Optional nearby location search</h2>
+          <p>
+            When you click &ldquo;Use my location&rdquo; on Explore Services, browser coordinates are rounded to two
+            decimal places before querying nearby services and are never stored in Doorstep marketplace tables.
+            Provider service-area centers are stored privately and search results show approximate distance only.
+          </p>
+        </div>
+
+        <div className="ds-prose-section">
+          <h2>Storage &amp; retention review</h2>
+          <p>
+            Account and marketplace records are stored in the configured Supabase project. Final hosting region,
+            sub-processor disclosures, cross-border safeguards, and retention schedules must be approved before live
+            commercial operations begin.
+          </p>
+        </div>
+
+        <div className="ds-prose-section">
+          <h2>Submit a privacy request</h2>
+          <p>
+            Subject to applicable Kenyan law, signed-in users may submit access, correction, objection, restriction,
+            portability, or erasure requests below for compliance staff review.
+          </p>
+
+          {params.submitted === '1' && (
+            <div className="ds-alert ds-alert-success" role="status">
+              <span>Your privacy request was recorded for compliance review.</span>
+            </div>
+          )}
+          {params.error && (
+            <div className="ds-alert ds-alert-error" role="alert">
+              <span>The request could not be recorded. Confirm the compliance migration is applied and try again.</span>
+            </div>
+          )}
+
+          {user ? (
+            <form action={submitPrivacyRequest} style={{ display: 'grid', gap: 14, marginTop: 8 }}>
+              <label className="ds-field">
+                Request type
+                <select className="ds-select" name="request_kind" required>
+                  {requestOptions.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="ds-field">
+                Details (avoid ID numbers or passwords)
+                <textarea
+                  className="ds-textarea"
+                  name="details"
+                  maxLength={1200}
+                  rows={4}
+                  placeholder="Describe the information or processing you are asking about..."
+                />
+              </label>
+              <div>
+                <button className="ds-btn ds-btn-primary" type="submit">
+                  Submit privacy request
+                </button>
+              </div>
+            </form>
+          ) : (
+            <p className="ds-alert ds-alert-info">
+              <span>
+                <Link href="/login" style={{ fontWeight: 700, textDecoration: 'underline' }}>
+                  Sign in
+                </Link>{' '}
+                to submit a privacy request.
+              </span>
+            </p>
+          )}
+
+          {requests.length > 0 && (
+            <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
+              <h3 style={{ fontSize: '1.05rem' }}>Your recent privacy requests</h3>
+              <ul className="ds-record-list">
+                {requests.map((request) => (
+                  <li className="ds-record-item" key={request.id}>
+                    <div>
+                      <strong>{request.request_kind.replaceAll('_', ' ')}</strong>
+                      <p className="ds-muted" style={{ fontSize: '0.84rem' }}>
+                        {new Date(request.created_at).toLocaleDateString('en-KE')}
+                      </p>
+                    </div>
+                    <Badge tone={request.status === 'fulfilled' ? 'success' : 'warning'}>
+                      {request.status.replaceAll('_', ' ')}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        <div className="ds-actions-row" style={{ paddingTop: 8 }}>
+          <Link className="ds-btn ds-btn-secondary ds-btn-sm" href="/terms">
+            Read marketplace terms
+          </Link>
+          <Link className="ds-btn ds-btn-ghost ds-btn-sm" href="/report">
+            Report a safety issue or complaint
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
 }

@@ -1,11 +1,21 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getSampleProvider } from '@/lib/marketplace-data';
-import { createClient } from '@/lib/supabase/server';
-import { SampleBookingForm } from './sample-booking-form';
-import { RequestServiceForm } from './request-service-form';
 import type { Metadata } from 'next';
+import { ArrowLeft, Briefcase, CalendarClock, Flag, MapPin } from 'lucide-react';
+import { getSampleProvider } from '@/lib/marketplace-data';
+import { formatKenyanDateTime, getCategoryImage } from '@/lib/kenya';
+import { createClient } from '@/lib/supabase/server';
+import { Badge, VerifiedBadge } from '@/components/ui/badge';
+import { RatingStars } from '@/components/ui/rating-stars';
+import { PortfolioLightbox, type GalleryItem } from '@/components/provider/portfolio-lightbox';
+import { SaveProviderButton } from '@/components/provider/save-provider-button';
+import { ProviderProfileInteractive } from '@/components/provider/provider-profile-interactive';
 
-export const metadata: Metadata = { title: 'Provider profile | Doorstep', description: 'View provider services, business details, and availability on Doorstep.' };
+export const metadata: Metadata = {
+  title: 'Professional Profile | Doorstep Kenya',
+  description: 'View professional skills, portfolio work, transparent starting prices, and availability on Doorstep.',
+};
 
 type LiveProfile = {
   profile_id: string;
@@ -13,72 +23,389 @@ type LiveProfile = {
   location: string;
   bio: string;
   years_experience: number;
+  verified: boolean;
+  headline?: string;
+  skills?: string[];
   categories: { name: string } | null;
 };
 type LiveService = { id: string; name: string; description: string; starting_price: number | string; currency: string };
-
-function price(value: number, currency: string) {
-  try { return new Intl.NumberFormat('en-KE', { style: 'currency', currency: currency.trim(), maximumFractionDigits: 2 }).format(value); }
-  catch { return `${currency.trim()} ${value.toLocaleString('en-KE')}`; }
-}
+type LiveReview = { id: string; rating: number; comment: string; created_at: string };
 
 export default async function ProviderProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const sample = getSampleProvider(id);
+
   if (sample) {
     const demoServices = [
-      { name: 'Quick visit', price: sample.startingPrice, currency: 'KES' },
-      { name: 'Standard service', price: sample.startingPrice * 2, currency: 'KES' },
-      { name: 'Larger project', price: sample.startingPrice * 4, currency: 'KES' },
+      {
+        id: 'sample-svc-1',
+        name: `${sample.category} diagnostic & quick visit`,
+        description: `Standard inspection and minor ${sample.category.toLowerCase()} work within ${sample.location}.`,
+        starting_price: sample.startingPrice,
+        currency: 'KES',
+      },
+      {
+        id: 'sample-svc-2',
+        name: `Standard ${sample.category.toLowerCase()} service`,
+        description: 'Full single-session repair, installation, or servicing (materials quoted separately).',
+        starting_price: sample.startingPrice * 2,
+        currency: 'KES',
+      },
+      {
+        id: 'sample-svc-3',
+        name: `Comprehensive project package`,
+        description: 'Multi-day or larger residential/commercial scope with written estimate.',
+        starting_price: sample.startingPrice * 4,
+        currency: 'KES',
+      },
     ];
-    return <main className="wrap profile-page">
-      <a className="back" href="/browse">← Back to services</a>
-      <header className="card profile-header"><div className="av profile-avatar">{sample.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}</div><div><p className="eyebrow">{sample.category}</p><h1>{sample.businessName}</h1><p className="muted">{sample.location}</p></div><span className="tag sample-tag">Sample profile</span></header>
-      <div className="profile-grid"><div>
-        <section className="card profile-section"><h2>About</h2><p>{sample.about}</p><p className="muted">{sample.categoryDescription}</p></section>
-        <section className="card profile-section"><h2>Services and starting prices</h2>{demoServices.map((service) => <div className="row" key={service.name}><span>{service.name}</span><strong>From {price(service.price, service.currency)}</strong></div>)}<p className="note">Illustrative prices for the preview; this provider is not a real listing.</p></section>
-        <section className="card profile-section"><h2>Portfolio</h2><div className="tiles">{[1,2,3,4].map((item) => <div key={item}>Sample work placeholder</div>)}</div><p className="note">Providers will upload their own work after portfolio tools are connected.</p></section>
-        <section className="card profile-section"><h2>Reviews</h2><p className="muted">No real reviews are available for this sample profile.</p></section>
-      </div><aside className="profile-sticky">
-        <section className="card profile-section"><h2>Availability</h2><p>{sample.availability}</p><p className="note">Sample availability only; no calendar is connected.</p></section>
-        <section className="card profile-section"><h2>Request a booking</h2><SampleBookingForm services={demoServices}/></section>
-      </aside></div>
-    </main>;
+
+    const sampleGallery: GalleryItem[] = [
+      { id: 's1', url: sample.image, caption: `${sample.category} craft showcase (Sample)` },
+      { id: 's2', url: '/images/hero-secondary.jpg', caption: 'On-site client consultation (Sample)' },
+    ];
+
+    return (
+      <main className="ds-container ds-profile-page">
+        <Link className="ds-back-link" href="/browse">
+          <ArrowLeft size={15} aria-hidden="true" />
+          Back to services
+        </Link>
+
+        <header className="ds-card ds-profile-hero">
+          <div className="ds-profile-identity">
+            <div className="ds-profile-avatar">
+              <Image
+                src={sample.image}
+                alt={`${sample.businessName} category photography`}
+                fill
+                sizes="80px"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+            <div style={{ display: 'grid', gap: 6 }}>
+              <div className="ds-actions-row">
+                <Badge tone="navy">{sample.category}</Badge>
+                <Badge tone="amber">Sample profile</Badge>
+              </div>
+              <h1 style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.3rem)' }}>{sample.businessName}</h1>
+              <div className="ds-actions-row ds-muted" style={{ fontSize: '0.92rem' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <MapPin size={15} aria-hidden="true" />
+                  {sample.location}
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <Briefcase size={15} aria-hidden="true" />
+                  {sample.experienceLabel}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="ds-actions-row">
+            <SaveProviderButton providerId={sample.id} initialSaved={false} canSave={false} />
+            <Link className="ds-btn ds-btn-ghost ds-btn-sm" href="/report">
+              <Flag size={14} aria-hidden="true" />
+              Report
+            </Link>
+          </div>
+        </header>
+
+        <ProviderProfileInteractive
+          mode="sample"
+          category={sample.category}
+          location={sample.location}
+          services={demoServices}
+          mainBeforeBooking={
+            <section className="ds-card ds-profile-block">
+              <h2>About {sample.name}</h2>
+              <p>{sample.about}</p>
+              <p className="ds-muted">{sample.categoryDescription}</p>
+              <div className="ds-skills-list">
+                {sample.skills.map((skill) => (
+                  <Badge key={skill} tone="neutral">
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            </section>
+          }
+          asideAboveBooking={
+            <section className="ds-card ds-profile-block">
+              <h2>Availability</h2>
+              <p style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <CalendarClock size={17} aria-hidden="true" />
+                <span>{sample.availability}</span>
+              </p>
+              <p className="ds-muted" style={{ fontSize: '0.84rem' }}>
+                Illustrative schedule only; connect a live profile to view weekly EAT hours.
+              </p>
+            </section>
+          }
+          asideBelowBooking={
+            <>
+              <section className="ds-card ds-profile-block">
+                <h2>Portfolio gallery</h2>
+                <PortfolioLightbox items={sampleGallery} businessName={sample.businessName} />
+                <p className="ds-muted" style={{ fontSize: '0.84rem' }}>
+                  Sample photography shown for demonstration. Live providers upload private portfolio photos from their
+                  dashboard.
+                </p>
+              </section>
+
+              <section className="ds-card ds-profile-block">
+                <h2>Customer reviews</h2>
+                <p className="ds-muted">No real customer reviews are attached to illustrative sample profiles.</p>
+              </section>
+            </>
+          }
+        />
+      </main>
+    );
   }
 
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) notFound();
+
   const supabase = await createClient();
-  const { data: rawProfile, error } = await supabase.from('provider_profiles').select('profile_id, business_name, location, bio, years_experience, categories(name)').eq('profile_id', id).maybeSingle();
-  if (error || !rawProfile) notFound();
+  let rawProfile: Record<string, unknown> | null = null;
+  const enhancedProfileQuery = await supabase
+    .from('provider_profiles')
+    .select('profile_id, business_name, location, bio, years_experience, verified, headline, skills, categories(name)')
+    .eq('profile_id', id)
+    .maybeSingle();
+
+  if (enhancedProfileQuery.error) {
+    // Fallback if optional enhancement migration has not been applied yet.
+    const baseQuery = await supabase
+      .from('provider_profiles')
+      .select('profile_id, business_name, location, bio, years_experience, verified, categories(name)')
+      .eq('profile_id', id)
+      .maybeSingle();
+    if (baseQuery.error || !baseQuery.data) notFound();
+    rawProfile = baseQuery.data as unknown as Record<string, unknown>;
+  } else if (!enhancedProfileQuery.data) {
+    notFound();
+  } else {
+    rawProfile = enhancedProfileQuery.data as unknown as Record<string, unknown>;
+  }
+
   const profile = {
     ...rawProfile,
-    categories: Array.isArray(rawProfile.categories) ? rawProfile.categories[0] || null : rawProfile.categories,
+    categories: Array.isArray(rawProfile.categories)
+      ? (rawProfile.categories[0] as { name: string } | null) || null
+      : (rawProfile.categories as { name: string } | null),
   } as LiveProfile;
-  const [servicesResult, portfolioResult, availabilityResult] = await Promise.all([
-    supabase.from('services').select('id, name, description, starting_price, currency').eq('provider_id', id).eq('active', true).order('created_at', { ascending: false }),
-    supabase.from('portfolio_items').select('id, storage_path, caption').eq('provider_id', id).order('sort_order').order('created_at'),
-    supabase.from('availability').select('weekday, start_time, end_time').eq('provider_id', id).eq('is_open', true).order('weekday'),
+
+  const categoryName = profile.categories?.name || 'Service provider';
+
+  const [servicesResult, portfolioResult, availabilityResult, authResult] = await Promise.all([
+    supabase
+      .from('services')
+      .select('id, name, description, starting_price, currency')
+      .eq('provider_id', id)
+      .eq('active', true)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('portfolio_items')
+      .select('id, storage_path, caption')
+      .eq('provider_id', id)
+      .order('sort_order')
+      .order('created_at'),
+    supabase
+      .from('availability')
+      .select('weekday, start_time, end_time')
+      .eq('provider_id', id)
+      .eq('is_open', true)
+      .order('weekday'),
+    supabase.auth.getUser(),
   ]);
+
+  const currentUser = authResult.data.user;
+  let canSave = false;
+  let initialSaved = false;
+  let reviews: LiveReview[] = [];
+
+  try {
+    const [reviewsRes, profileRoleRes] = await Promise.all([
+      supabase
+        .from('reviews')
+        .select('id, rating, comment, created_at')
+        .eq('provider_id', id)
+        .order('created_at', { ascending: false })
+        .limit(30),
+      currentUser ? supabase.from('profiles').select('role').eq('id', currentUser.id).maybeSingle() : Promise.resolve({ data: null }),
+    ]);
+    if (!reviewsRes.error && reviewsRes.data) {
+      reviews = reviewsRes.data as LiveReview[];
+    }
+    if (currentUser && profileRoleRes.data?.role === 'customer') {
+      canSave = true;
+      const savedRes = await supabase
+        .from('saved_providers')
+        .select('provider_id')
+        .eq('customer_id', currentUser.id)
+        .eq('provider_id', id)
+        .maybeSingle();
+      if (!savedRes.error && savedRes.data) initialSaved = true;
+    }
+  } catch {
+    // Reviews and saved providers stay safely optional before migration is applied.
+  }
+
   const services = (servicesResult.data || []) as LiveService[];
   const portfolioItems = portfolioResult.data || [];
-  const signedPortfolio = await Promise.all(portfolioItems.map(async (item) => {
-    const { data } = await supabase.storage.from('doorstep-provider-portfolio').createSignedUrl(item.storage_path, 3600);
-    return { id: item.id, caption: item.caption, url: data?.signedUrl || '' };
-  }));
+  const signedPortfolio: GalleryItem[] = (
+    await Promise.all(
+      portfolioItems.map(async (item) => {
+        const { data } = await supabase.storage
+          .from('doorstep-provider-portfolio')
+          .createSignedUrl(item.storage_path, 3600);
+        return { id: item.id, caption: item.caption || '', url: data?.signedUrl || '' };
+      }),
+    )
+  ).filter((item) => Boolean(item.url));
+
   const openDays = availabilityResult.data || [];
   const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const avgRating =
+    reviews.length > 0 ? reviews.reduce((sum, item) => sum + Number(item.rating), 0) / reviews.length : null;
+  const heroPhoto = signedPortfolio[0]?.url || getCategoryImage(categoryName);
 
-  return <main className="wrap profile-page">
-    <a className="back" href="/browse">← Back to services</a>
-    <header className="card profile-header"><div className="av profile-avatar">{profile.business_name.trim().slice(0, 1).toUpperCase()}</div><div><p className="eyebrow">{profile.categories?.name || 'Service provider'}</p><h1>{profile.business_name}</h1><p className="muted">{profile.location}</p></div></header>
-    <div className="profile-grid"><div>
-      <section className="card profile-section"><h2>About</h2><p>{profile.bio || 'This provider has not added a business description yet.'}</p>{profile.years_experience > 0 && <p className="muted">{profile.years_experience} years of experience</p>}</section>
-      <section className="card profile-section"><h2>Services and starting prices</h2>{servicesResult.error ? <p className="auth-error" role="alert">Published services could not be loaded.</p> : services.length ? services.map((service) => <div className="profile-service" key={service.id}><div className="row"><span>{service.name}</span><strong>From {price(Number(service.starting_price), service.currency)}</strong></div>{service.description && <p className="muted">{service.description}</p>}</div>) : <p className="muted">No published services at the moment.</p>}</section>
-      <section className="card profile-section"><h2>Reviews</h2><p className="muted">Reviews are not available in the current prototype.</p></section>
-    </div><aside className="profile-sticky">
-      <section className="card profile-section"><h2>Portfolio</h2>{portfolioResult.error ? <p className="muted">Portfolio items could not be loaded.</p> : signedPortfolio.length ? <div className="portfolio-grid">{signedPortfolio.filter((item) => item.url).map((item) => <figure className="portfolio-item" key={item.id}><img src={item.url} alt={item.caption || `${profile.business_name} portfolio work`} loading="lazy"/>{item.caption && <figcaption>{item.caption}</figcaption>}</figure>)}</div> : <p className="muted">This provider has not added portfolio images yet.</p>}</section>
-      <section className="card profile-section"><h2>Availability</h2>{availabilityResult.error ? <p className="muted">Availability could not be loaded.</p> : openDays.length ? <ul className="profile-hours">{openDays.map((day) => <li key={day.weekday}><span>{weekdayNames[day.weekday]}</span><span>{day.start_time.slice(0, 5)}–{day.end_time.slice(0, 5)} EAT</span></li>)}</ul> : <p className="muted">This provider has not published availability yet.</p>}</section>
-      <section className="card profile-section"><h2>Booking request</h2><RequestServiceForm services={services}/></section>
-    </aside></div>
-  </main>;
+  return (
+    <main className="ds-container ds-profile-page">
+      <Link className="ds-back-link" href="/browse">
+        <ArrowLeft size={15} aria-hidden="true" />
+        Back to services
+      </Link>
+
+      <header className="ds-card ds-profile-hero">
+        <div className="ds-profile-identity">
+          <div className="ds-profile-avatar">
+            <Image
+              src={heroPhoto}
+              alt={`${profile.business_name} profile showcase`}
+              fill
+              unoptimized={heroPhoto.startsWith('http')}
+              sizes="80px"
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
+          <div style={{ display: 'grid', gap: 6 }}>
+            <div className="ds-actions-row">
+              <Badge tone="navy">{categoryName}</Badge>
+              {profile.verified === true && <VerifiedBadge />}
+              {avgRating !== null && <RatingStars rating={avgRating} count={reviews.length} />}
+            </div>
+            <h1 style={{ fontSize: 'clamp(1.6rem, 3.2vw, 2.3rem)' }}>{profile.business_name}</h1>
+            {profile.headline && (
+              <p className="ds-muted" style={{ fontWeight: 500 }}>
+                {profile.headline}
+              </p>
+            )}
+            <div className="ds-actions-row ds-muted" style={{ fontSize: '0.92rem' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <MapPin size={15} aria-hidden="true" />
+                {profile.location}
+              </span>
+              {profile.years_experience > 0 && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <Briefcase size={15} aria-hidden="true" />
+                  {profile.years_experience} years experience
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="ds-actions-row">
+          <SaveProviderButton providerId={profile.profile_id} initialSaved={initialSaved} canSave={canSave} />
+          <Link className="ds-btn ds-btn-ghost ds-btn-sm" href="/report">
+            <Flag size={14} aria-hidden="true" />
+            Report
+          </Link>
+        </div>
+      </header>
+
+      <ProviderProfileInteractive
+        mode="live"
+        category={categoryName}
+        location={profile.location}
+        services={services}
+        mainBeforeBooking={
+          <section className="ds-card ds-profile-block">
+            <h2>About this professional</h2>
+            <p>{profile.bio || 'This provider has not added a business description yet.'}</p>
+            {Array.isArray(profile.skills) && profile.skills.length > 0 && (
+              <div className="ds-skills-list">
+                {profile.skills.map((skill) => (
+                  <Badge key={skill} tone="neutral">
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </section>
+        }
+        asideAboveBooking={
+          <section className="ds-card ds-profile-block">
+            <h2>Weekly availability</h2>
+            {availabilityResult.error ? (
+              <p className="ds-muted">Availability could not be loaded.</p>
+            ) : openDays.length > 0 ? (
+              <ul className="ds-hours-list">
+                {openDays.map((day) => (
+                  <li key={day.weekday}>
+                    <strong>{weekdayNames[day.weekday]}</strong>
+                    <span className="tabular-nums ds-muted">
+                      {day.start_time.slice(0, 5)}–{day.end_time.slice(0, 5)} EAT
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="ds-muted">This provider has not published weekly hours yet.</p>
+            )}
+          </section>
+        }
+        asideBelowBooking={
+          <>
+            <section className="ds-card ds-profile-block">
+              <h2>Work portfolio</h2>
+              {portfolioResult.error ? (
+                <p className="ds-muted">Portfolio items could not be loaded.</p>
+              ) : signedPortfolio.length > 0 ? (
+                <PortfolioLightbox items={signedPortfolio} businessName={profile.business_name} />
+              ) : (
+                <p className="ds-muted">This provider has not added portfolio images yet.</p>
+              )}
+            </section>
+
+            <section className="ds-card ds-profile-block">
+              <div className="ds-panel-head">
+                <h2>Customer reviews</h2>
+                {avgRating !== null && <RatingStars rating={avgRating} count={reviews.length} />}
+              </div>
+              {reviews.length > 0 ? (
+                <div>
+                  {reviews.map((review) => (
+                    <article className="ds-review-item" key={review.id}>
+                      <div className="ds-actions-row" style={{ justifyContent: 'space-between' }}>
+                        <RatingStars rating={review.rating} showCount={false} />
+                        <span className="ds-muted" style={{ fontSize: '0.82rem' }}>
+                          {formatKenyanDateTime(review.created_at)}
+                        </span>
+                      </div>
+                      {review.comment && <p>{review.comment}</p>}
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="ds-muted">No verified customer reviews yet. Reviews appear after completed jobs.</p>
+              )}
+            </section>
+          </>
+        }
+      />
+    </main>
+  );
 }
